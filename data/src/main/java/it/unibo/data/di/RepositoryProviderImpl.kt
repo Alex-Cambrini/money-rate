@@ -1,6 +1,7 @@
 package it.unibo.data.di
 
 import android.content.Context
+import it.unibo.data.local.db.AppDatabase
 import it.unibo.domain.di.RepositoryProvider
 import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.data.remote.RetrofitClient
