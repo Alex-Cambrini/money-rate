@@ -38,6 +38,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.room.runtime)
+    implementation(project(":domain"))
     ksp(libs.androidx.room.compiler)
     implementation(libs.room.ktx)
 
