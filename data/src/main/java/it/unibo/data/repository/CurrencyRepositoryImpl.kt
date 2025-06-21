@@ -5,11 +5,12 @@ import it.unibo.data.local.entity.CurrencyRateEntity
 import it.unibo.data.remote.CurrencyApi
 import it.unibo.data.remote.models.ExchangeRatesResponse
 import it.unibo.domain.model.CurrencyRate
+import it.unibo.domain.repository.CurrencyRepository
 
 class CurrencyRepositoryImpl(
     private val dao: CurrencyRateDao,
     private val api: CurrencyApi
-) {
+)  : CurrencyRepository {
 
     companion object {
         private const val CACHE_VALIDITY = 10 * 60 * 1000L // 10 minute
@@ -28,8 +29,16 @@ class CurrencyRepositoryImpl(
         }
     }
 
-    suspend fun getAvailableCurrencies(): List<String> {
-        return api.getCurrencies().keys.sorted()
+    override suspend fun getRate(from: String, to: String): Double {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAllRates(base: String): Map<String, Double> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAvailableCurrencies(): List<String> {
+        TODO("Not yet implemented")
     }
 
     private suspend fun cacheIsRecent(): Boolean {
