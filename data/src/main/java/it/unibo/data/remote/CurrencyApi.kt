@@ -10,4 +10,7 @@ interface CurrencyApi {
         @Query("from") from: String,
         @Query("to") to: String
     ): ExchangeRatesResponse
+
+    @GET("currencies")
+    suspend fun getCurrencies(): Map<String, String>
 }
