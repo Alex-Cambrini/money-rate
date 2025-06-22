@@ -8,7 +8,7 @@ interface CurrencyApi {
     @GET("latest")
     suspend fun getLatestRates(
         @Query("from") from: String,
-        @Query("to") to: String
+        @Query("to") to: String? = null
     ): ExchangeRatesResponse
 
     @GET("currencies")
