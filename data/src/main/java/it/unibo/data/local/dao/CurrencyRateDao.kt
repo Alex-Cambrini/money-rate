@@ -1,10 +1,12 @@
 package it.unibo.data.local.dao
 
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import it.unibo.data.local.entity.CurrencyRateEntity
 
+@Dao
 interface CurrencyRateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRates(rates: List<CurrencyRateEntity>)
