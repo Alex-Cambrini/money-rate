@@ -1,6 +1,7 @@
 package it.unibo.moneyrate
 
 import android.app.Application
+import it.unibo.data.di.RepositoryProviderImpl
 import it.unibo.domain.di.UseCaseProvider
 
 class CustomApplication: Application() {
