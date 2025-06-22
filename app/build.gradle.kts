@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "it.unibo.cryptotrack"
+    namespace = "it.unibo.moneyrate"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "it.unibo.cryptotrack"
+        applicationId = "it.unibo.moneyrate"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
