@@ -1,11 +1,14 @@
 package it.unibo.domain.di
 
-import it.unibo.domain.repository.CurrencyRepository
+import it.unibo.domain.usecase.ConvertCurrencyUseCase
+import it.unibo.domain.usecase.ConvertCurrencyUseCaseImpl
 
 object UseCaseProvider {
-    private lateinit var currencyRepository: CurrencyRepository
+    lateinit var convertCurrencyUseCase: ConvertCurrencyUseCase
 
     fun setup(repositoryProvider: RepositoryProvider) {
-        this.currencyRepository = repositoryProvider.currencyRepository
+        convertCurrencyUseCase = ConvertCurrencyUseCaseImpl(
+            currencyRepository = repositoryProvider.currencyRepository
+        )
     }
 }
