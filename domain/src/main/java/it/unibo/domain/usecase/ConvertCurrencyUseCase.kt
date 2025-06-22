@@ -11,6 +11,5 @@ class ConvertCurrencyUseCase(
         amount: Double
     ): Double {
         val rate = repo.getRate(from, to)
-        return amount * rate
     }
 }
