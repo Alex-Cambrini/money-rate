@@ -5,11 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import it.unibo.data.local.dao.CurrencyRateDao
+import it.unibo.data.local.dao.WalletDao
 import it.unibo.data.local.entity.CurrencyRateEntity
+import it.unibo.data.local.entity.WalletEntryEntity
 
-@Database(entities = [CurrencyRateEntity::class], version = 1, exportSchema = false)
+@Database(entities = [CurrencyRateEntity::class, WalletEntryEntity::class], version = 2, exportSchema = false)
+
 abstract class AppDatabase : RoomDatabase() {
     abstract fun currencyRateDao(): CurrencyRateDao
+    abstract fun walletDao(): WalletDao
 
     companion object {
         @Volatile
@@ -21,7 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build().also { INSTANCE = it }
+                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
             }
         }
     }
