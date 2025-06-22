@@ -30,15 +30,19 @@ class CurrencyRepositoryImpl(
     }
 
     override suspend fun getRate(from: String, to: String): Double {
-        TODO("Not yet implemented")
+        val rates = getRates(from)
+        return rates.find { it.to == to }?.rate
+            ?: throw IllegalArgumentException("Rate not available for $from -> $to")
     }
 
     override suspend fun getAllRates(base: String): Map<String, Double> {
-        TODO("Not yet implemented")
+        val rates = getRates(base)
+        return rates.associate { it.to to it.rate }
     }
 
     override suspend fun getAvailableCurrencies(): List<String> {
-        TODO("Not yet implemented")
+        val response = api.getCurrencies()
+        return response.keys.toList()
     }
 
     private suspend fun cacheIsRecent(): Boolean {
