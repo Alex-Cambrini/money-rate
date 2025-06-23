@@ -13,41 +13,82 @@ class CurrencyRepositoryImpl(
 )  : CurrencyRepository {
 
     companion object {
-        private const val CACHE_VALIDITY = 10 * 60 * 1000L // 10 minute
+        private const val CACHE_VALIDITY = 10 * 60 * 1000L // 10 minutes
     }
 
-    suspend fun getRates(from: String): List<CurrencyRate> {
-        return if (from == "EUR" && cacheIsRecent()) {
-            val cachedEntities = dao.getRatesByBase(from)
-            cachedEntities.map { it.toDomain() }
+    override suspend fun getAllRates(base: String): Map<String, Double> {
+        println("getAllRates called with base=$base")
+
+        return if (base == "EUR" && cacheIsRecent()) {
+            println("Cache is recent, loading rates from DB")
+            val ratesFromDb = dao.getRatesByBase(base)
+            println("Rates from DB: $ratesFromDb")
+            ratesFromDb.associate { it.currencyCode to it.rate }
         } else {
-            val to = "EUR"
-            val response = api.getLatestRates(from = from, to = to)
+            println("Cache not recent or base != EUR, fetching from API")
+            val response = try {
+                api.getLatestRates(from = base, to = null)
+            } catch (e: Exception) {
+                println("API call failed: ${e.message}")
+                return emptyMap()
+            }
+            println("API response: $response")
             val entities = response.toEntities()
-            dao.insertRates(entities)
-            entities.map { it.toDomain() }
+            println("Converted to entities: $entities")
+            if (base == "EUR") {
+                println("Inserting rates into DB")
+                dao.insertRates(entities)
+            }
+            entities.associate { it.currencyCode to it.rate }
         }
     }
 
     override suspend fun getRate(from: String, to: String): Double {
-        val rates = getRates(from)
-        return rates.find { it.to == to }?.rate
-            ?: throw IllegalArgumentException("Rate not available for $from -> $to")
-    }
+        println("getRate called from=$from to=$to")
 
-    override suspend fun getAllRates(base: String): Map<String, Double> {
-        val rates = getRates(base)
-        return rates.associate { it.to to it.rate }
+        if (from == "EUR" && cacheIsRecent()) {
+            println("Cache is recent, checking DB")
+            dao.getRate(from, to)?.let {
+                println("Found rate in DB: $it")
+                return it
+            }
+        }
+
+        println("Fetching rate from API")
+        val response = try {
+            api.getLatestRates(from = from, to = to)
+        } catch (e: Exception) {
+            println("API call failed: ${e.message}")
+            throw e
+        }
+        val entities = response.toEntities()
+        println("Converted to entities: $entities")
+        if (from == "EUR") {
+            println("Inserting rates into DB")
+            dao.insertRates(entities)
+        }
+        val rate = entities.firstOrNull { it.currencyCode == to }?.rate
+        println("Rate found: $rate")
+        return rate ?: throw IllegalArgumentException("Rate not available for $from -> $to")
     }
 
     override suspend fun getAvailableCurrencies(): List<String> {
-        val response = api.getCurrencies()
+        println("getAvailableCurrencies called")
+        val response = try {
+            api.getCurrencies()
+        } catch (e: Exception) {
+            println("API call failed: ${e.message}")
+            return emptyList()
+        }
+        println("Available currencies: ${response.keys}")
         return response.keys.toList()
     }
 
     private suspend fun cacheIsRecent(): Boolean {
+        val rates = dao.getRatesByBase("EUR")
+        if (rates.isEmpty()) return false
         val expiryTime = System.currentTimeMillis() - CACHE_VALIDITY
-        val oldRates = dao.getRatesByBase("EUR").filter { it.timestamp < expiryTime }
+        val oldRates = rates.filter { it.timestamp < expiryTime }
         return oldRates.isEmpty()
     }
 
