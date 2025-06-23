@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview.android)
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(libs.androidx.foundation.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
