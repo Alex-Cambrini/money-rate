@@ -99,8 +99,8 @@ fun HomeScreen(repository: CurrencyRepository) {
                     val oldTarget = targetCurrency
                     baseCurrency = oldTarget
                     targetCurrency = oldBase
-                    viewModel.loadRate(oldBase, oldTarget)
-                }, modifier = Modifier
+                    viewModel.loadRate(oldTarget, oldBase)
+                },modifier = Modifier
                     .wrapContentSize()
                     .align(Alignment.CenterVertically)
             ) {
