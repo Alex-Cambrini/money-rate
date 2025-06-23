@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
-import it.unibo.composeui.screens.HomeScreen
+import com.example.moneyrate.ui.theme.MoneyRateTheme
+import it.unibo.composeui.screens.MainScreen
 import it.unibo.composeui.screens.SplashScreen
 import it.unibo.data.di.RepositoryProviderImpl
 
@@ -17,15 +18,16 @@ class MainActivity : ComponentActivity() {
         repositoryProvider = RepositoryProviderImpl(this)
 
         setContent {
-            var showSplash by remember { mutableStateOf(true) }
+            MoneyRateTheme {
+                var showSplash by remember { mutableStateOf(true) }
 
-            if (showSplash) {
-                SplashScreen {
-                    showSplash = false
+                if (showSplash) {
+                    SplashScreen {
+                        showSplash = false
+                    }
+                } else {
+                    MainScreen(repositoryProvider)
                 }
-            }
-            else {
-                HomeScreen(repositoryProvider.currencyRepository)
             }
         }
     }
