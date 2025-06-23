@@ -25,8 +25,12 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration(true) // parametro booleano obbligatorio
+                    .build()
+                    .also { INSTANCE = it }
             }
         }
     }
 }
+
