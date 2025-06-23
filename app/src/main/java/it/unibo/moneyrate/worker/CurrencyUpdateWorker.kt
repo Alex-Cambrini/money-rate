@@ -12,12 +12,10 @@ class CurrencyUpdateWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val repository: CurrencyRepository =
-            RepositoryProviderImpl(context).currencyRepository
-
+        val repository: CurrencyRepository = RepositoryProviderImpl(context).currencyRepository
         return try {
-            repository.getAllRates("EUR")
-            Result.success()
+            val success = repository.refreshCache()
+            if (success) Result.success() else Result.retry()
         } catch (e: Exception) {
             Result.retry()
         }
