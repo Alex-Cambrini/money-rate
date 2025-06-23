@@ -39,11 +39,16 @@ fun HomeScreen(repository: CurrencyRepository) {
     var amount by remember { mutableStateOf("") }
     var result by remember { mutableStateOf<Double?>(null) }
 
-    val availableCurrencies = remember { listOf("EUR", "USD", "GBP", "JPY") }
+    val availableCurrencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
     val focusManager = LocalFocusManager.current
 
     var baseExpanded by remember { mutableStateOf(false) }
     var targetExpanded by remember { mutableStateOf(false) }
+
+
+    LaunchedEffect(Unit) {
+        viewModel.loadCurrencies()
+    }
 
     LaunchedEffect(rate, amount) {
         val currentRate = rate
@@ -102,10 +107,11 @@ fun HomeScreen(repository: CurrencyRepository) {
 
             Button(
                 onClick = {
-                    val temp = baseCurrency
-                    baseCurrency = targetCurrency
-                    targetCurrency = temp
-                    viewModel.loadRate(baseCurrency, targetCurrency)
+                    val oldBase = baseCurrency
+                    val oldTarget = targetCurrency
+                    baseCurrency = oldTarget
+                    targetCurrency = oldBase
+                    viewModel.loadRate(oldBase, oldTarget)
                 },
                 modifier = Modifier
                     .wrapContentSize()
