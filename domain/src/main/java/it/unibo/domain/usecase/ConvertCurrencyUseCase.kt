@@ -10,7 +10,7 @@ class ConvertCurrencyUseCaseImpl (
     private val currencyRepository: CurrencyRepository
 ): ConvertCurrencyUseCase {
     override suspend fun invoke(from: String, to: String): CurrencyRate {
-        val rate = currencyRepository.getRate(from, to)
+        val rate = currencyRepository.getRate(from, to) ?: 0.0
         return CurrencyRate(from, to, rate)
     }
 }
