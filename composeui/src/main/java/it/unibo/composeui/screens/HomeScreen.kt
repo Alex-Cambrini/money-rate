@@ -9,24 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.viewmodel.HomeViewModel
 import it.unibo.domain.repository.CurrencyRepository
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.Alignment
-
-class HomeViewModelFactory(private val repository: CurrencyRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+import it.unibo.composeui.viewmodel.HomeViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +42,8 @@ fun HomeScreen(repository: CurrencyRepository) {
     LaunchedEffect(rate, amount) {
         val currentRate = rate
         val amountDouble = amount.toDoubleOrNull()
-        result = if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
+        result =
+            if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
     }
 
     Column(
@@ -63,12 +53,10 @@ fun HomeScreen(repository: CurrencyRepository) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 CurrencyDropdown(
                     label = "Base Currency",
@@ -112,8 +100,7 @@ fun HomeScreen(repository: CurrencyRepository) {
                     baseCurrency = oldTarget
                     targetCurrency = oldBase
                     viewModel.loadRate(oldBase, oldTarget)
-                },
-                modifier = Modifier
+                }, modifier = Modifier
                     .wrapContentSize()
                     .align(Alignment.CenterVertically)
             ) {
@@ -153,30 +140,21 @@ fun CurrencyDropdown(
     modifier: Modifier = Modifier
 ) {
     ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = onExpandedChange,
-        modifier = modifier
+        expanded = expanded, onExpandedChange = onExpandedChange, modifier = modifier
     ) {
-        TextField(
-            value = selectedCurrency,
+        TextField(value = selectedCurrency,
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor()
         )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) }
-        ) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
             currencies.forEach { currency ->
-                DropdownMenuItem(
-                    text = { Text(currency) },
-                    onClick = {
-                        onCurrencySelected(currency)
-                        onExpandedChange(false)
-                    }
-                )
+                DropdownMenuItem(text = { Text(currency) }, onClick = {
+                    onCurrencySelected(currency)
+                    onExpandedChange(false)
+                })
             }
         }
     }
@@ -197,9 +175,7 @@ fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
 @Composable
 fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
     Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = Modifier.fillMaxWidth()
+        onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth()
     ) {
         Text("Convert")
     }
