@@ -1,31 +1,22 @@
 package it.unibo.composeui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.unibo.domain.model.CurrencyRate
 import it.unibo.domain.repository.CurrencyRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: CurrencyRepository) : ViewModel() {
-    private val _rates = MutableStateFlow<List<CurrencyRate>>(emptyList())
-    val rates: StateFlow<List<CurrencyRate>> = _rates
+    private val _rate = MutableStateFlow<Double?>(null)
+    val rate: StateFlow<Double?> = _rate
 
-    fun loadRates(base: String = "EUR") {
+    fun loadRate(base: String = "EUR", to: String) {
         viewModelScope.launch {
-            Log.d("HomeViewModel", "Fetching rates for base: $base")
-            val ratesMap = repository.getAllRates(base)
-            Log.d("HomeViewModel", "RatesMap received: $ratesMap")
-            val list = ratesMap.map { (to, rate) ->
-                Log.d("HomeViewModel", "Rate item: $base -> $to = $rate")
-                CurrencyRate(from = base, to = to, rate = rate)
-            }
-            _rates.value = list
+            val r = repository.getRate(base, to)
+            _rate.value = r
         }
     }
-
 }
 
 class WalletViewModel(private val repository: CurrencyRepository) : ViewModel() {
