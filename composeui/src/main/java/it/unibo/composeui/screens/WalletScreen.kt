@@ -129,22 +129,6 @@ fun WalletScreen(
                 }
             }
 
-
-             /*   {
-                    Text(item.currency, style = MaterialTheme.typography.bodyMedium)
-                    Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
-                    Row {
-                        IconButton(onClick = { editEntryId = item.id }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit")
-                        }
-                        IconButton(onClick = { deleteEntryId = item.id }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete")
-                        }
-                    }
-                }
-
-            */
-
             items(entries) { item ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -176,10 +160,10 @@ fun WalletScreen(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Row {
-                                IconButton(onClick = { /* azione */ }) {
+                                IconButton(onClick = { editEntryId = item.id }) {
                                     Icon(Icons.Default.Edit, contentDescription = "Edit")
                                 }
-                                IconButton(onClick = { /* azione */ }) {
+                                IconButton(onClick = { deleteEntryId = item.id }) {
                                     Icon(Icons.Default.Delete, contentDescription = "Delete")
                                 }
                             }
