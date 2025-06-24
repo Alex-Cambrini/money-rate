@@ -140,7 +140,7 @@ fun CurrencyDropdown(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onCurrencySelected: (String) -> Unit,
-    currencies: List<String>,
+    currencies: List<Pair<String, String>>,
     modifier: Modifier = Modifier
 ) {
     ExposedDropdownMenuBox(
@@ -154,9 +154,9 @@ fun CurrencyDropdown(
             modifier = Modifier.menuAnchor()
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
-            currencies.forEach { currency ->
-                DropdownMenuItem(text = { Text(currency) }, onClick = {
-                    onCurrencySelected(currency)
+            currencies.forEach { (code, name) ->
+                DropdownMenuItem(text = { Text("$code - $name") }, onClick = {
+                    onCurrencySelected(code)
                     onExpandedChange(false)
                 })
             }
