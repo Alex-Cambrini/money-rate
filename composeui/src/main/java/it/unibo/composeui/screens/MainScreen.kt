@@ -49,7 +49,12 @@ fun MainScreen(repositoryProvider: RepositoryProviderImpl) {
             Modifier.padding(innerPadding)
         ) {
             composable("home") { HomeScreen(repositoryProvider.currencyRepository) }
-            composable("wallet") {  }
+            composable("wallet") {
+                WalletScreen(
+                    currencyRepository = repositoryProvider.currencyRepository,
+                    walletRepository = repositoryProvider.walletRepository
+                )
+            }
         }
     }
 }
