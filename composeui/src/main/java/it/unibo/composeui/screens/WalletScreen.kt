@@ -1,49 +1,49 @@
 package it.unibo.composeui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import it.unibo.composeui.viewmodel.WalletViewModel
+import it.unibo.composeui.viewmodel.WalletViewModelFactory
+import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.domain.repository.WalletRepository
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WalletScreen(
-    onAddClick: () -> Unit = {},
-    onEditClick: (Int) -> Unit = {},
-    onDeleteClick: (Int) -> Unit = {}
+    currencyRepository: CurrencyRepository,
+    walletRepository: WalletRepository
 ) {
-    val sampleItems = listOf(
-        "Wallet 1 - 100€",
-        "Wallet 2 - 250€",
-        "Wallet 3 - 75€"
+    val viewModel: WalletViewModel = viewModel(
+        factory = WalletViewModelFactory(currencyRepository, walletRepository)
     )
+
+    val entries by viewModel.entries.collectAsState()
+    val total by viewModel.total.collectAsState()
+    val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+
+    var showAddDialog by remember { mutableStateOf(false) }
+    var editEntryId by remember { mutableStateOf<Int?>(null) }
+    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadCurrencies()
+    }
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
-                Icon(Icons.Default.Add, contentDescription = "Add Wallet")
+            FloatingActionButton(onClick = { showAddDialog = true }) {
+                Icon(Icons.Default.Add, contentDescription = "Aggiungi Wallet")
             }
         }
     ) { padding ->
@@ -53,29 +53,27 @@ fun WalletScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            Text("Controvalore Totale: 425€", style = MaterialTheme.typography.titleLarge)
-
+            Text("Controvalore Totale: ${"%.2f".format(total)}€", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Lista Wallet
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                sampleItems.forEachIndexed { index, item ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(item)
-
-                        Row {
-                            IconButton(onClick = { onEditClick(index) }) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit")
-                            }
-                            IconButton(onClick = { onDeleteClick(index) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+            if (entries.isEmpty()) {
+                Text("Nessun wallet disponibile.")
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    entries.forEach { item ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("${item.currency}: ${item.amount}")
+                            Row {
+                                IconButton(onClick = { editEntryId = item.id }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Modifica")
+                                }
+                                IconButton(onClick = { deleteEntryId = item.id }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Elimina")
+                                }
                             }
                         }
                     }
@@ -83,10 +81,190 @@ fun WalletScreen(
             }
         }
     }
+
+    if (showAddDialog) {
+        AddWalletDialog(
+            availableCurrencies = currencies.filter { currency ->
+                entries.none { it.currency == currency }
+            },
+            onDismiss = { showAddDialog = false },
+            onConfirm = { currency, amount ->
+                viewModel.addWallet(currency, amount)
+                showAddDialog = false
+            }
+        )
+    }
+
+    val entryToEdit = entries.find { it.id == editEntryId }
+    if (entryToEdit != null) {
+        EditWalletDialog(
+            initialAmount = entryToEdit.amount,
+            onDismiss = { editEntryId = null },
+            onConfirm = { delta ->
+                viewModel.modifyWallet(entryToEdit, delta)
+                editEntryId = null
+            }
+        )
+    }
+
+    val entryToDelete = entries.find { it.id == deleteEntryId }
+    if (entryToDelete != null) {
+        ConfirmDeleteDialog(
+            onConfirm = {
+                viewModel.deleteWallet(entryToDelete)
+                deleteEntryId = null
+            },
+            onDismiss = { deleteEntryId = null }
+        )
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun WalletScreenPreview() {
-    WalletScreen()
+fun AddWalletDialog(
+    availableCurrencies: List<String>,
+    onDismiss: () -> Unit,
+    onConfirm: (String, Double) -> Unit
+) {
+    var selectedCurrency by remember { mutableStateOf(availableCurrencies.firstOrNull() ?: "") }
+    var amountText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Aggiungi Wallet") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                DropdownMenuCurrencySelector(
+                    currencies = availableCurrencies,
+                    selected = selectedCurrency,
+                    onSelected = { selectedCurrency = it }
+                )
+                TextField(
+                    value = amountText,
+                    onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) amountText = it },
+                    label = { Text("Quantità") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val amount = amountText.toDoubleOrNull()
+                    if (amount != null && selectedCurrency.isNotBlank()) {
+                        onConfirm(selectedCurrency, amount)
+                    }
+                }
+            ) {
+                Text("Conferma")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Annulla")
+            }
+        }
+    )
+}
+
+@Composable
+fun EditWalletDialog(
+    initialAmount: Double,
+    onDismiss: () -> Unit,
+    onConfirm: (Double) -> Unit
+) {
+    var amountText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Modifica Quantità") },
+        text = {
+            TextField(
+                value = amountText,
+                onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it },
+                label = { Text("Delta (+/-)") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val delta = amountText.toDoubleOrNull()
+                    if (delta != null) {
+                        onConfirm(delta)
+                    }
+                }
+            ) {
+                Text("Salva")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Annulla")
+            }
+        }
+    )
+}
+
+@Composable
+fun ConfirmDeleteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Elimina Wallet") },
+        text = { Text("Sei sicuro di voler eliminare questo wallet?") },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Elimina")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Annulla")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownMenuCurrencySelector(
+    currencies: List<String>,
+    selected: String,
+    onSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        TextField(
+            value = selected,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Valuta") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            currencies.forEach { currency ->
+                DropdownMenuItem(
+                    text = { Text(currency) },
+                    onClick = {
+                        onSelected(currency)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
 }
