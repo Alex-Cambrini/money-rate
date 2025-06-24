@@ -72,4 +72,11 @@ class CurrencyRepositoryImpl(
     private fun ExchangeRatesResponse.toEntities() = rates.map { (currency, rate) ->
         CurrencyRateEntity(currencyCode = currency, rate = rate, base = base, timestamp = System.currentTimeMillis())
     }
+
+    override suspend fun getAllRatesToEuro(): Map<String, Double> {
+        if (!refreshCache()) return emptyMap()
+
+        val rates = dao.getRatesByBase(CACHE_BASE)
+        return rates.associate { it.currencyCode to it.rate }
+    }
 }
