@@ -59,7 +59,9 @@ fun HomeScreen(repository: CurrencyRepository) {
 
     LaunchedEffect(availableCurrencies) {
         if (availableCurrencies.isNotEmpty()) {
-            viewModel.loadAllRatesAgainstEuro(availableCurrencies.filter { it != "EUR" })
+            viewModel.loadAllRatesAgainstEuro(
+                availableCurrencies.map { it.first }.filter { it != "EUR" }
+            )
         }
     }
 
