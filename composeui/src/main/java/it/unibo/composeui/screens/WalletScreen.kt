@@ -1,6 +1,8 @@
 package it.unibo.composeui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,6 +20,16 @@ import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.composeui.viewmodel.WalletViewModelFactory
 import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.domain.repository.WalletRepository
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Dp
+import it.unibo.domain.model.WalletEntry
 
 @Composable
 fun WalletScreen(
@@ -31,6 +43,15 @@ fun WalletScreen(
     val entries by viewModel.entries.collectAsState()
     val total by viewModel.total.collectAsState()
     val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+
+    val colors = listOf(
+        MaterialTheme.colorScheme.primary,
+        MaterialTheme.colorScheme.secondary,
+        MaterialTheme.colorScheme.tertiary,
+        MaterialTheme.colorScheme.error,
+        MaterialTheme.colorScheme.primaryContainer,
+        MaterialTheme.colorScheme.secondaryContainer,
+    )
 
     var showAddDialog by remember { mutableStateOf(false) }
     var editEntryId by remember { mutableStateOf<Int?>(null) }
@@ -47,33 +68,74 @@ fun WalletScreen(
             }
         }
     ) { padding ->
-        Column(
+        LazyColumn(
+            contentPadding = padding,
             modifier = Modifier
-                .padding(padding)
                 .padding(16.dp)
-                .fillMaxSize()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Total Value: ${"%.2f".format(total)}€", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(16.dp))
+            item {
+                Text(
+                    text = "Total Value: ${"%.2f".format(total)}€",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            if (entries.isEmpty()) {
-                Text("No wallets available.")
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    entries.forEach { item ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("${item.currency}: ${item.amount}")
-                            Row {
-                                IconButton(onClick = { editEntryId = item.id }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
-                                }
-                                IconButton(onClick = { deleteEntryId = item.id }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
-                                }
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    WalletDonutChart(
+                        entries = entries,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(vertical = 16.dp)
+                    )
+                }
+            }
+
+            itemsIndexed(entries) { index, item ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .background(colors[index % colors.size], shape = CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("${item.currency}: %.2f".format(item.amount))
+                }
+            }
+
+            item {
+                if (entries.isEmpty()) {
+                    Text("No wallets available.", color = MaterialTheme.colorScheme.onBackground)
+                } else {
+                    Text("Wallets", style = MaterialTheme.typography.titleLarge)
+                }
+            }
+
+            items(entries) { item ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(item.currency, style = MaterialTheme.typography.bodyMedium)
+                        Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
+                        Row {
+                            IconButton(onClick = { editEntryId = item.id }) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                            }
+                            IconButton(onClick = { deleteEntryId = item.id }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete")
                             }
                         }
                     }
@@ -82,7 +144,7 @@ fun WalletScreen(
         }
     }
 
-    if (showAddDialog) {
+        if (showAddDialog) {
         AddWalletDialog(
             availableCurrencies = currencies.filter { currency ->
                 entries.none { it.currency == currency }
@@ -265,6 +327,41 @@ fun DropdownMenuCurrencySelector(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun WalletDonutChart(
+    entries: List<WalletEntry>,
+    modifier: Modifier = Modifier,
+    size: Dp = 200.dp,
+    thickness: Dp = 30.dp
+) {
+    val total = entries.sumOf { it.amount }
+    if (total == 0.0) return
+
+    val colors = listOf(
+        MaterialTheme.colorScheme.primary,
+        MaterialTheme.colorScheme.secondary,
+        MaterialTheme.colorScheme.tertiary,
+        MaterialTheme.colorScheme.error,
+        MaterialTheme.colorScheme.primaryContainer,
+        MaterialTheme.colorScheme.secondaryContainer,
+    )
+
+    Canvas(modifier = modifier.size(size)) {
+        var startAngle = -90f
+        entries.forEachIndexed { index, entry ->
+            val sweep = (entry.amount / total * 360f).toFloat()
+            drawArc(
+                color = colors[index % colors.size],
+                startAngle = startAngle,
+                sweepAngle = sweep,
+                useCenter = false,
+                style = Stroke(width = thickness.toPx(), cap = StrokeCap.Butt)
+            )
+            startAngle += sweep
         }
     }
 }
