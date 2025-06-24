@@ -54,11 +54,11 @@ class CurrencyRepositoryImpl(
         }
     }
 
-    override suspend fun getAvailableCurrencies(): List<String> {
+    override suspend fun getAvailableCurrencies():  Map<String, String> {
         return try {
-            api.getCurrencies().keys.toList()
+            api.getCurrencies()
         } catch (e: Exception) {
-            emptyList()
+            emptyMap()
         }
     }
 
