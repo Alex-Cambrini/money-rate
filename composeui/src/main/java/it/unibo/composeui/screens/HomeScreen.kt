@@ -17,13 +17,21 @@ import it.unibo.domain.repository.CurrencyRepository
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
 import it.unibo.composeui.viewmodel.HomeViewModelFactory
+import androidx.compose.foundation.Canvas
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(repository: CurrencyRepository) {
     val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(repository))
     val rate by viewModel.rate.collectAsStateWithLifecycle(initialValue = null)
+    val latestRates by viewModel.latestRates.collectAsStateWithLifecycle(emptyMap())
     val scrollState = rememberScrollState()
 
     var baseCurrency by remember { mutableStateOf("EUR") }
@@ -47,6 +55,12 @@ fun HomeScreen(repository: CurrencyRepository) {
         val amountDouble = amount.toDoubleOrNull()
         result =
             if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
+    }
+
+    LaunchedEffect(availableCurrencies) {
+        if (availableCurrencies.isNotEmpty()) {
+            viewModel.loadAllRatesAgainstEuro(availableCurrencies.filter { it != "EUR" })
+        }
     }
 
     Column(
@@ -129,6 +143,18 @@ fun HomeScreen(repository: CurrencyRepository) {
         )
 
         ResultDisplay(result, amount, baseCurrency, targetCurrency)
+        if (latestRates.isNotEmpty()) {
+            Text(
+                text = "Valute ordinate per forza (riferite a 1 EUR)",
+                style = MaterialTheme.typography.titleMedium
+            )
+            val top10Rates = latestRates.entries
+                .sortedBy { it.value }
+                .take(10)
+                .associate { it.key to it.value }
+
+            CurrencyBarChart(top10Rates)
+        }
     }
 }
 
@@ -192,5 +218,66 @@ fun ResultDisplay(result: Double?, amount: String, baseCurrency: String, targetC
             text = "$amount $baseCurrency = ${"%.4f".format(it)} $targetCurrency",
             style = MaterialTheme.typography.titleMedium
         )
+    }
+}
+
+@Composable
+fun CurrencyBarChart(rates: Map<String, Double>) {
+    if (rates.isEmpty()) return
+
+    val sortedRates = rates.entries
+        .sortedByDescending { it.value }
+        .take(5)
+    val maxRate = sortedRates.maxOf { it.value }
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(280.dp)
+            .padding(horizontal = 8.dp)
+    ) {
+        val count = sortedRates.size
+        val barWidth = size.width / (count * 1.5f)
+        val spacing = (size.width - barWidth * count) / (count + 1)
+        val maxHeight = size.height - 32.dp.toPx()
+
+        sortedRates.forEachIndexed { i, (currency, rate) ->
+            val normalized = (rate / maxRate).toFloat()
+            val height = normalized * maxHeight
+            val x = spacing + i * (barWidth + spacing)
+            val y = maxHeight - height
+
+            val color = if (rate == maxRate) Color.Red else Color(0xFF90CAF9)
+
+            drawRect(
+                color = color,
+                topLeft = Offset(x, y),
+                size = Size(barWidth, height)
+            )
+
+            val paintLabel = android.graphics.Paint().apply {
+                textAlign = android.graphics.Paint.Align.CENTER
+                textSize = 24f
+            }
+
+            val paintValue = android.graphics.Paint().apply {
+                textAlign = android.graphics.Paint.Align.CENTER
+                textSize = 22f
+            }
+
+            drawContext.canvas.nativeCanvas.drawText(
+                currency,
+                x + barWidth / 2,
+                size.height,
+                paintLabel
+            )
+
+            drawContext.canvas.nativeCanvas.drawText(
+                "%.2f".format(rate),
+                x + barWidth / 2,
+                y - 6,
+                paintValue
+            )
+        }
     }
 }

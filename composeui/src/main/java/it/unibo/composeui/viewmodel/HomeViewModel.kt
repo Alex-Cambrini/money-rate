@@ -26,4 +26,15 @@ class HomeViewModel(private val repository: CurrencyRepository) : ViewModel() {
             _currencies.value = map.toList()
         }
     }
+    fun loadAllRatesAgainstEuro(targets: List<String>) {
+        viewModelScope.launch {
+            val result = mutableMapOf<String, Double>()
+            for (target in targets) {
+                val rate = repository.getRate("EUR", target)
+                if (rate != null) result[target] = rate
+            }
+            _latestRates.value = result
+        }
+    }
+
 }
