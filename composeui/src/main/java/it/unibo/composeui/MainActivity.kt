@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
-import com.example.moneyrate.ui.theme.MoneyRateTheme
+import androidx.compose.runtime.saveable.rememberSaveable
+import it.unibo.composeui.theme.MoneyRateTheme
 import it.unibo.composeui.screens.MainScreen
 import it.unibo.composeui.screens.SplashScreen
 import it.unibo.data.di.RepositoryProviderImpl
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MoneyRateTheme {
-                var showSplash by remember { mutableStateOf(true) }
+                var showSplash by rememberSaveable { mutableStateOf(true) }
 
                 if (showSplash) {
                     SplashScreen {

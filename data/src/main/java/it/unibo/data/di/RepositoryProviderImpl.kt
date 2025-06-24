@@ -1,6 +1,7 @@
 package it.unibo.data.di
 
 import android.content.Context
+import it.unibo.data.NetworkCheckerImpl
 import it.unibo.data.local.db.AppDatabase
 import it.unibo.domain.di.RepositoryProvider
 import it.unibo.domain.repository.CurrencyRepository
@@ -8,6 +9,7 @@ import it.unibo.data.remote.RetrofitClient
 import it.unibo.data.repository.CurrencyRepositoryImpl
 import it.unibo.domain.repository.WalletRepository
 import it.unibo.data.repository.WalletRepositoryImpl
+import it.unibo.domain.NetworkChecker
 
 class RepositoryProviderImpl(private val context: Context) : RepositoryProvider {
 
@@ -24,5 +26,6 @@ class RepositoryProviderImpl(private val context: Context) : RepositoryProvider 
     override var walletRepository: WalletRepository = WalletRepositoryImpl(
         dao = walletDao
     )
+    override val networkChecker: NetworkChecker = NetworkCheckerImpl(context)
 }
 

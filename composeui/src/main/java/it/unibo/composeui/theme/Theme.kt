@@ -1,4 +1,4 @@
-package com.example.moneyrate.ui.theme
+package it.unibo.composeui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
