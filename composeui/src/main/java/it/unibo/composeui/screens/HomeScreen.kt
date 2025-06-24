@@ -1,7 +1,9 @@
 package it.unibo.composeui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
@@ -22,6 +24,7 @@ import it.unibo.composeui.viewmodel.HomeViewModelFactory
 fun HomeScreen(repository: CurrencyRepository) {
     val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(repository))
     val rate by viewModel.rate.collectAsStateWithLifecycle(initialValue = null)
+    val scrollState = rememberScrollState()
 
     var baseCurrency by remember { mutableStateOf("EUR") }
     var targetCurrency by remember { mutableStateOf("USD") }
@@ -49,6 +52,7 @@ fun HomeScreen(repository: CurrencyRepository) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
