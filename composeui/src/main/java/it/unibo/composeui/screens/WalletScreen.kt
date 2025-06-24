@@ -61,7 +61,11 @@ fun WalletScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
+            FloatingActionButton(
+                onClick = { showAddDialog = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Wallet")
             }
         }
@@ -76,37 +80,48 @@ fun WalletScreen(
             item {
                 Text(
                     text = "Total Value: ${"%.2f".format(total)}€",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    WalletDonutChart(
-                        entries = entries,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(vertical = 16.dp)
-                    )
-                }
-            }
-
-            itemsIndexed(entries) { index, item ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .background(colors[index % colors.size], shape = CircleShape)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("${item.currency}: %.2f".format(item.amount))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        WalletDonutChart(
+                            entries = entries,
+                            modifier = Modifier.size(150.dp),
+                            size = 150.dp,
+                            thickness = 24.dp
+                        )
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            entries.forEachIndexed { index, item ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(12.dp)
+                                            .background(colors[index % colors.size], shape = CircleShape)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("${item.currency}: %.2f".format(item.amount))
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
-            item {
+                item {
                 if (entries.isEmpty()) {
                     Text("No wallets available.", color = MaterialTheme.colorScheme.onBackground)
                 } else {
@@ -333,8 +348,8 @@ fun DropdownMenuCurrencySelector(
 fun WalletDonutChart(
     entries: List<WalletEntry>,
     modifier: Modifier = Modifier,
-    size: Dp = 200.dp,
-    thickness: Dp = 30.dp
+    size: Dp = 150.dp,
+    thickness: Dp = 24.dp
 ) {
     val total = entries.sumOf { it.amount }
     if (total == 0.0) return
@@ -348,18 +363,35 @@ fun WalletDonutChart(
         MaterialTheme.colorScheme.secondaryContainer,
     )
 
-    Canvas(modifier = modifier.size(size)) {
-        var startAngle = -90f
-        entries.forEachIndexed { index, entry ->
-            val sweep = (entry.amount / total * 360f).toFloat()
-            drawArc(
-                color = colors[index % colors.size],
-                startAngle = startAngle,
-                sweepAngle = sweep,
-                useCenter = false,
-                style = Stroke(width = thickness.toPx(), cap = StrokeCap.Butt)
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    Box(contentAlignment = Alignment.Center) {
+        Canvas(modifier = modifier.size(size)) {
+            var startAngle = -90f
+            entries.forEachIndexed { index, entry ->
+                val sweep = (entry.amount / total * 360f).toFloat()
+                drawArc(
+                    color = colors[index % colors.size],
+                    startAngle = startAngle,
+                    sweepAngle = sweep,
+                    useCenter = false,
+                    style = Stroke(width = thickness.toPx(), cap = StrokeCap.Butt)
+                )
+                startAngle += sweep
+            }
+        }
+
+        selectedIndex?.let { i ->
+            val entry = entries[i]
+            Text(
+                text = "${entry.currency}: ${"%.2f".format(entry.amount)}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
             )
-            startAngle += sweep
         }
     }
+    LaunchedEffect(entries) {
+        selectedIndex = null
+    }
 }
+
