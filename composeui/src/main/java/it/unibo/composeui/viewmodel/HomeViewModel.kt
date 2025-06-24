@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 class HomeViewModel(private val repository: CurrencyRepository) : ViewModel() {
     private val _rate = MutableStateFlow<Double?>(null)
     private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
+    private val _latestRates = MutableStateFlow<Map<String, Double>>(emptyMap())
+    val latestRates: StateFlow<Map<String, Double>> = _latestRates
     val rate: StateFlow<Double?> = _rate
     val currencies: StateFlow<List<Pair<String, String>>> = _currencies
 
