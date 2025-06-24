@@ -22,10 +22,10 @@ import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.domain.repository.WalletRepository
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import it.unibo.domain.model.WalletEntry
 
@@ -40,7 +40,7 @@ fun WalletScreen(
 
     val entries by viewModel.entries.collectAsState()
     val total by viewModel.total.collectAsState()
-    val currencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+    val currencies: List<Pair<String, String>> by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
 
     val colors = listOf(
         MaterialTheme.colorScheme.primary,
@@ -80,7 +80,7 @@ fun WalletScreen(
             item {
                 Text(
                     text = "Total Value: ${"%.2f".format(total)}€",
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -113,7 +113,7 @@ fun WalletScreen(
                                             .background(colors[index % colors.size], shape = CircleShape)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("${item.currency}: %.2f".format(item.amount))
+                                    Text("${item.currencyCode}: %.2f".format(item.amount))
                                 }
                             }
                         }
@@ -129,6 +129,22 @@ fun WalletScreen(
                 }
             }
 
+
+             /*   {
+                    Text(item.currency, style = MaterialTheme.typography.bodyMedium)
+                    Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
+                    Row {
+                        IconButton(onClick = { editEntryId = item.id }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit")
+                        }
+                        IconButton(onClick = { deleteEntryId = item.id }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
+                    }
+                }
+
+            */
+
             items(entries) { item ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -138,33 +154,51 @@ fun WalletScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(item.currency, style = MaterialTheme.typography.bodyMedium)
-                        Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
-                        Row {
-                            IconButton(onClick = { editEntryId = item.id }) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit")
-                            }
-                            IconButton(onClick = { deleteEntryId = item.id }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(item.currencyCode, style = MaterialTheme.typography.bodyMedium)
+                            Text(item.currencyName, style = MaterialTheme.typography.bodySmall)
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
+                            Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodySmall)
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Row {
+                                IconButton(onClick = { /* azione */ }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                }
+                                IconButton(onClick = { /* azione */ }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                }
                             }
                         }
                     }
                 }
+
             }
         }
     }
 
         if (showAddDialog) {
         AddWalletDialog(
-            availableCurrencies = currencies.filter { currency ->
-                entries.none { it.currency == currency }
+            availableCurrencies = currencies.filter { (code, _) ->
+                entries.none { it.currencyCode == code }
             },
             onDismiss = { showAddDialog = false },
             onConfirm = { currency, amount ->
-                viewModel.addWallet(currency, amount)
+                viewModel.addWallet(currency,  amount)
                 showAddDialog = false
             }
         )
@@ -196,11 +230,11 @@ fun WalletScreen(
 
 @Composable
 fun AddWalletDialog(
-    availableCurrencies: List<String>,
+    availableCurrencies: List<Pair<String, String>>,
     onDismiss: () -> Unit,
     onConfirm: (String, Double) -> Unit
 ) {
-    var selectedCurrency by remember { mutableStateOf(availableCurrencies.firstOrNull() ?: "") }
+    var selectedCurrency by remember { mutableStateOf(availableCurrencies.firstOrNull()?.first.orEmpty()) }
     var amountText by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -209,9 +243,11 @@ fun AddWalletDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DropdownMenuCurrencySelector(
-                    currencies = availableCurrencies,
-                    selected = selectedCurrency,
-                    onSelected = { selectedCurrency = it }
+                    currencies = availableCurrencies.map { "${it.first} - ${it.second}" },
+                    selected = availableCurrencies.find { it.first == selectedCurrency }?.let { "${it.first} - ${it.second}" } ?: "",
+                    onSelected = { selectedString ->
+                        selectedCurrency = selectedString.substringBefore(" - ")
+                    }
                 )
                 TextField(
                     value = amountText,
@@ -384,7 +420,7 @@ fun WalletDonutChart(
         selectedIndex?.let { i ->
             val entry = entries[i]
             Text(
-                text = "${entry.currency}: ${"%.2f".format(entry.amount)}",
+                text = "${entry.currencyCode}: ${"%.2f".format(entry.amount)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )

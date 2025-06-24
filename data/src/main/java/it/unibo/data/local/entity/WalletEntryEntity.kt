@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "wallet")
 data class WalletEntryEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val currency: String,
+    val currencyCode: String,
+    val currencyName: String,
     val amount: Double
 )

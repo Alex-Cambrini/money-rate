@@ -31,13 +31,15 @@ class WalletRepositoryImpl(
 
     private fun WalletEntry.toEntity() = WalletEntryEntity(
         id = this.id,
-        currency = this.currency,
+        currencyCode = this.currencyCode,
+        currencyName = this.currencyName,
         amount = this.amount
     )
 
     private fun WalletEntryEntity.toDomain() = WalletEntry(
         id = this.id,
-        currency = this.currency,
+        currencyCode = this.currencyCode,
+        currencyName = this.currencyName,
         amount = this.amount
     )
 }
