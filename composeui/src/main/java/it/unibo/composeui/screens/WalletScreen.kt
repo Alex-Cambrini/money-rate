@@ -152,7 +152,7 @@ fun WalletScreen(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
-                            Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodySmall)
+                            Text("%.2f€".format(item.amount), style = MaterialTheme.typography.bodySmall)
                         }
                         Column(
                             modifier = Modifier.weight(1f),
