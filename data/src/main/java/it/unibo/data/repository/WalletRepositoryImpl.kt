@@ -15,6 +15,10 @@ class WalletRepositoryImpl(
         dao.insert(entry.toEntity())
     }
 
+    override suspend fun updateEntry(entry: WalletEntry) {
+        dao.update(entry.toEntity())
+    }
+
     override suspend fun removeEntry(entry: WalletEntry) {
         dao.delete(entry.toEntity())
     }
@@ -26,11 +30,13 @@ class WalletRepositoryImpl(
     }
 
     private fun WalletEntry.toEntity() = WalletEntryEntity(
+        id = this.id,
         currency = this.currency,
         amount = this.amount
     )
 
     private fun WalletEntryEntity.toDomain() = WalletEntry(
+        id = this.id,
         currency = this.currency,
         amount = this.amount
     )
