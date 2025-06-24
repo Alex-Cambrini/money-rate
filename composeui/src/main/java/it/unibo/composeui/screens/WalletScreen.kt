@@ -43,7 +43,7 @@ fun WalletScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Aggiungi Wallet")
+                Icon(Icons.Default.Add, contentDescription = "Add Wallet")
             }
         }
     ) { padding ->
@@ -53,11 +53,11 @@ fun WalletScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            Text("Controvalore Totale: ${"%.2f".format(total)}€", style = MaterialTheme.typography.titleLarge)
+            Text("Total Value: ${"%.2f".format(total)}€", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(16.dp))
 
             if (entries.isEmpty()) {
-                Text("Nessun wallet disponibile.")
+                Text("No wallets available.")
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     entries.forEach { item ->
@@ -69,10 +69,10 @@ fun WalletScreen(
                             Text("${item.currency}: ${item.amount}")
                             Row {
                                 IconButton(onClick = { editEntryId = item.id }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Modifica")
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
                                 }
                                 IconButton(onClick = { deleteEntryId = item.id }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Elimina")
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
                                 }
                             }
                         }
@@ -130,7 +130,7 @@ fun AddWalletDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Aggiungi Wallet") },
+        title = { Text("Add Wallet") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DropdownMenuCurrencySelector(
@@ -141,7 +141,7 @@ fun AddWalletDialog(
                 TextField(
                     value = amountText,
                     onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) amountText = it },
-                    label = { Text("Quantità") },
+                    label = { Text("Amount") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -156,12 +156,12 @@ fun AddWalletDialog(
                     }
                 }
             ) {
-                Text("Conferma")
+                Text("Confirm")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annulla")
+                Text("Cancel")
             }
         }
     )
@@ -177,7 +177,7 @@ fun EditWalletDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Modifica Quantità") },
+        title = { Text("Edit Amount") },
         text = {
             TextField(
                 value = amountText,
@@ -196,12 +196,12 @@ fun EditWalletDialog(
                     }
                 }
             ) {
-                Text("Salva")
+                Text("Save")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annulla")
+                Text("Cancel")
             }
         }
     )
@@ -214,16 +214,16 @@ fun ConfirmDeleteDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Elimina Wallet") },
-        text = { Text("Sei sicuro di voler eliminare questo wallet?") },
+        title = { Text("Delete Wallet") },
+        text = { Text("Are you sure you want to delete this wallet?") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Elimina")
+                Text("Delete")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annulla")
+                Text("Cancel")
             }
         }
     )
@@ -246,7 +246,7 @@ fun DropdownMenuCurrencySelector(
             value = selected,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Valuta") },
+            label = { Text("Currency") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()
