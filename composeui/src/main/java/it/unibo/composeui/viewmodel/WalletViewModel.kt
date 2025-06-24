@@ -22,8 +22,8 @@ class WalletViewModel(
     private val _total = MutableStateFlow(0.0)
     val total: StateFlow<Double> = _total
 
-    private val _currencies = MutableStateFlow<List<String>>(emptyList())
-    val currencies: StateFlow<List<String>> = _currencies
+    private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
+    val currencies: StateFlow<List<Pair<String, String>>> = _currencies
 
     init {
         viewModelScope.launch {
@@ -33,14 +33,16 @@ class WalletViewModel(
 
     fun loadCurrencies() {
         viewModelScope.launch {
-            _currencies.value = currencyRepository.getAvailableCurrencies()
+            val map = currencyRepository.getAvailableCurrencies()
+            println("Currencies loaded: $map")
+            _currencies.value = map.toList()
         }
     }
 
     private suspend fun calculateTotalInEuro(entries: List<WalletEntry>) {
         var sum = 0.0
         for (entry in entries) {
-            val rate = currencyRepository.getRate(entry.currency, "EUR") ?: continue
+            val rate = currencyRepository.getRate(entry.currencyCode, "EUR") ?: continue
             sum += entry.amount * rate
         }
         _total.value = sum
@@ -48,7 +50,8 @@ class WalletViewModel(
 
     fun addWallet(currency: String, amount: Double) {
         viewModelScope.launch {
-            val newEntry = WalletEntry(id = 0, currency = currency, amount = amount)
+            val name = _currencies.value.find { it.first == currency }?.second ?: currency
+            val newEntry = WalletEntry(id = 0, currencyCode = currency, currencyName = name, amount = amount)
             walletRepository.addEntry(newEntry)
         }
     }
