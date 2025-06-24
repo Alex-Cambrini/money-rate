@@ -6,9 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WalletDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: WalletEntryEntity)
+
+    @Update
+    suspend fun update(entry: WalletEntryEntity)
 
     @Delete
     suspend fun delete(entry: WalletEntryEntity)
