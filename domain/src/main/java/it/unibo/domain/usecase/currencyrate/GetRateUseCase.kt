@@ -8,10 +8,10 @@ interface ConvertCurrencyUseCase {
 }
 
 class ConvertCurrencyUseCaseImpl (
-    private val currencyRepository: CurrencyRateRepository
+    private val currencyRateRepository: CurrencyRateRepository
 ): ConvertCurrencyUseCase {
     override suspend fun invoke(from: String, to: String): CurrencyRate {
-        val rate = currencyRepository.getRate(from, to) ?: 0.0
+        val rate = currencyRateRepository.getRate(from, to) ?: 0.0
         return CurrencyRate(from, to, rate)
     }
 }
