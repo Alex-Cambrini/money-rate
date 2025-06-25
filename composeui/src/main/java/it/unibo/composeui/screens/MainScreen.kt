@@ -42,6 +42,7 @@ fun MainScreen(
                 composable("wallet") {
                     WalletScreen(
                         currencyRepository = repositoryProvider.currencyRepository,
+                        currencyRateRepository = repositoryProvider.currencyRateRepository,
                         walletRepository = repositoryProvider.walletRepository
                     )
                 }
