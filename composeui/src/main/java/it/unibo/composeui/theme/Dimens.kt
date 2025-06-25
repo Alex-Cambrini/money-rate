@@ -11,6 +11,7 @@ object Dimens {
     val elementSpacing: Dp = 8.dp
     val cardPadding: Dp = 12.dp
     val lazyListSpacing: Dp = 8.dp
+    val chartBottomPadding: Dp = 32.dp
 
     // Charts
     val barChartHeight: Dp = 280.dp
