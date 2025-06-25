@@ -1,4 +1,4 @@
-package it.unibo.domain.usecase
+package it.unibo.domain.usecase.currency
 
 import it.unibo.domain.repository.CurrencyRepository
 

@@ -1,7 +1,7 @@
-package it.unibo.domain.usecase
+package it.unibo.domain.usecase.currencyrate
 
-import it.unibo.domain.repository.CurrencyRateRepository
 import it.unibo.domain.model.CurrencyRate
+import it.unibo.domain.repository.CurrencyRateRepository
 
 interface ConvertCurrencyUseCase {
     suspend fun invoke(from: String, to: String): CurrencyRate
