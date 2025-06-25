@@ -3,17 +3,23 @@ package it.unibo.composeui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.domain.model.WalletEntry
-import it.unibo.domain.repository.WalletRepository
-import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
+import it.unibo.domain.di.UseCaseProvider
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class WalletViewModel(
-    private val currencyUseCase: GetAvailableCurrenciesUseCase,
-    private val walletRepository: WalletRepository // TODO: implement use case
-) : ViewModel() {
+class WalletViewModel : ViewModel() {
 
-    private val _entries = walletRepository.getAllEntries()
+    private val addEntryUseCase = UseCaseProvider.addEntryUseCase
+    private val updateEntryUseCase = UseCaseProvider.updateEntryUseCase
+    private val removeEntryUseCase = UseCaseProvider.removeEntryUseCase
+    private val getAllEntriesUseCase = UseCaseProvider.getAllEntryUseCase
+
+    private val getAvailableCurrenciesUseCase = UseCaseProvider.getAvailableCurrenciesUseCase
+    private val refreshCacheUseCase = UseCaseProvider.refreshCacheUseCase
+    private val getCachedRatesUseCase = UseCaseProvider.getCachedRatesUseCase
+
+    private val _entries = getAllEntriesUseCase
+        .invoke()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     val entries: StateFlow<List<WalletEntry>> = _entries
@@ -33,27 +39,20 @@ class WalletViewModel(
         }
     }
 
-    fun convertToEuro(entry: WalletEntry): Double {
-        val rate = _ratesCache.value[entry.currencyCode] ?: return 0.0
-        return entry.amount / rate
-    }
-
     private fun loadRatesCache() {
         viewModelScope.launch {
-            val refreshed = currencyRepository.refreshCache()
+            val refreshed = refreshCacheUseCase.invoke()
             if (refreshed) {
-                val rates = currencyRepository.getCachedRates()
+                val rates = getCachedRatesUseCase.invoke()
                 _ratesCache.value = rates + ("EUR" to 1.0)
                 calculateTotalInEuro(_entries.value)
-            } else {
-                // gestisci errore o usa cache vecchia
             }
         }
     }
 
     fun loadCurrencies() {
         viewModelScope.launch {
-            val map = currencyRepository.getAvailableCurrencies()
+            val map = getAvailableCurrenciesUseCase.invoke()
             _currencies.value = map.toList()
         }
     }
@@ -61,28 +60,34 @@ class WalletViewModel(
     private fun calculateTotalInEuro(entries: List<WalletEntry>) {
         var sum = 0.0
         for (entry in entries) {
-            sum += convertToEuro(entry)        }
+            sum += convertToEuro(entry)
+        }
         _total.value = sum
+    }
+
+    fun convertToEuro(entry: WalletEntry): Double {
+        val rate = _ratesCache.value[entry.currencyCode] ?: return 0.0
+        return entry.amount / rate
     }
 
     fun addWallet(currency: String, amount: Double) {
         viewModelScope.launch {
             val name = _currencies.value.find { it.first == currency }?.second ?: currency
             val newEntry = WalletEntry(id = 0, currencyCode = currency, currencyName = name, amount = amount)
-            walletRepository.addEntry(newEntry)
+            addEntryUseCase.invoke(newEntry)
         }
     }
 
     fun modifyWallet(entry: WalletEntry, delta: Double) {
         viewModelScope.launch {
             val updated = entry.copy(amount = entry.amount + delta)
-            walletRepository.updateEntry(updated)
+            updateEntryUseCase.invoke(updated)
         }
     }
 
     fun deleteWallet(entry: WalletEntry) {
         viewModelScope.launch {
-            walletRepository.removeEntry(entry)
+            removeEntryUseCase.invoke(entry)
         }
     }
 }
