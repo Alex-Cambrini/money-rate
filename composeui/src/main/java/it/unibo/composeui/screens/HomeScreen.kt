@@ -65,13 +65,15 @@ fun HomeScreen(repository: CurrencyRepository) {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Scaffold { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(16.dp)
+                .fillMaxSize()
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
@@ -128,34 +130,35 @@ fun HomeScreen(repository: CurrencyRepository) {
             }
         }
 
-        AmountInput(amount) { newValue ->
-            if (newValue.all { it.isDigit() || it == '.' }) amount = newValue
-        }
-
-        ConvertButton(
-
-            enabled = amount.toDoubleOrNull() != null,
-
-            onClick = {
-
-                viewModel.loadRate(baseCurrency, targetCurrency)
-
+            AmountInput(amount) { newValue ->
+                if (newValue.all { it.isDigit() || it == '.' }) amount = newValue
             }
 
-        )
+            ConvertButton(
 
-        ResultDisplay(result, amount, baseCurrency, targetCurrency)
-        if (latestRates.isNotEmpty()) {
-            Text(
-                text = "Valute ordinate per forza (riferite a 1 EUR)",
-                style = MaterialTheme.typography.titleMedium
+                enabled = amount.toDoubleOrNull() != null,
+
+                onClick = {
+
+                    viewModel.loadRate(baseCurrency, targetCurrency)
+
+                }
+
             )
-            val top10Rates = latestRates.entries
-                .sortedBy { it.value }
-                .take(10)
-                .associate { it.key to it.value }
 
-            CurrencyBarChart(top10Rates)
+            ResultDisplay(result, amount, baseCurrency, targetCurrency)
+            if (latestRates.isNotEmpty()) {
+                Text(
+                    text = "Valute ordinate per forza (riferite a 1 EUR)",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                val top10Rates = latestRates.entries
+                    .sortedBy { it.value }
+                    .take(10)
+                    .associate { it.key to it.value }
+
+                CurrencyBarChart(top10Rates)
+            }
         }
     }
 }
@@ -236,7 +239,7 @@ fun CurrencyBarChart(rates: Map<String, Double>) {
         modifier = Modifier
             .fillMaxWidth()
             .height(280.dp)
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 16.dp)
     ) {
         val count = sortedRates.size
         val barWidth = size.width / (count * 1.5f)
