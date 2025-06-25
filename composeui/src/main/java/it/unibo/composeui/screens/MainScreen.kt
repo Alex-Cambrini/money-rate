@@ -8,10 +8,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.MainViewModel
 import it.unibo.composeui.viewmodel.MainViewModelFactory
 import it.unibo.data.di.RepositoryProviderImpl
@@ -86,7 +86,7 @@ fun ConnectionStatusBanner(viewModel: MainViewModel, modifier: Modifier = Modifi
             color = MaterialTheme.colorScheme.error,
             modifier = modifier
                 .fillMaxWidth()
-                .height(40.dp),
+                .height(Dimens.connectionBannerHeight)
         ) {
             Box(
                 contentAlignment = Alignment.Center,
