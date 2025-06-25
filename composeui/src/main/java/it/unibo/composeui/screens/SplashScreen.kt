@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import it.unibo.composeui.theme.Dimens
 import kotlinx.coroutines.delay
 
 
@@ -34,12 +35,12 @@ fun SplashScreen(onFinished: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "MoneyRate",
-                fontSize = 36.sp,
+                fontSize = Dimens.splashTitleSize,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimens.splashSpacerHeight))
 
             androidx.compose.material3.CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.onPrimary
