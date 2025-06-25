@@ -3,20 +3,25 @@ package it.unibo.composeui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.domain.model.WalletEntry
-import it.unibo.domain.di.UseCaseProvider
+import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
+import it.unibo.domain.usecase.currencyrate.GetCachedRatesUseCase
+import it.unibo.domain.usecase.currencyrate.RefreshCacheUseCase
+import it.unibo.domain.usecase.wallet.AddEntryUseCase
+import it.unibo.domain.usecase.wallet.GetAllEntriesUseCase
+import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
+import it.unibo.domain.usecase.wallet.UpdateEntryUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class WalletViewModel : ViewModel() {
-
-    private val addEntryUseCase = UseCaseProvider.addEntryUseCase
-    private val updateEntryUseCase = UseCaseProvider.updateEntryUseCase
-    private val removeEntryUseCase = UseCaseProvider.removeEntryUseCase
-    private val getAllEntriesUseCase = UseCaseProvider.getAllEntryUseCase
-
-    private val getAvailableCurrenciesUseCase = UseCaseProvider.getAvailableCurrenciesUseCase
-    private val refreshCacheUseCase = UseCaseProvider.refreshCacheUseCase
-    private val getCachedRatesUseCase = UseCaseProvider.getCachedRatesUseCase
+class WalletViewModel(
+    private val addEntryUseCase: AddEntryUseCase,
+    private val updateEntryUseCase: UpdateEntryUseCase,
+    private val removeEntryUseCase: RemoveEntryUseCase,
+    private val getAllEntriesUseCase: GetAllEntriesUseCase,
+    private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase,
+    private val refreshCacheUseCase: RefreshCacheUseCase,
+    private val getCachedRatesUseCase: GetCachedRatesUseCase
+) : ViewModel() {
 
     private val _entries = getAllEntriesUseCase
         .invoke()
