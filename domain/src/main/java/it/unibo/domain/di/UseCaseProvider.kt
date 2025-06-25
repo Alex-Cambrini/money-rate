@@ -1,9 +1,9 @@
 package it.unibo.domain.di
 
-import it.unibo.domain.usecase.ConvertCurrencyUseCase
-import it.unibo.domain.usecase.ConvertCurrencyUseCaseImpl
-import it.unibo.domain.usecase.GetAvailableCurrenciesUseCase
-import it.unibo.domain.usecase.GetAvailableCurrenciesUseCaseImpl
+import it.unibo.domain.usecase.currencyrate.ConvertCurrencyUseCase
+import it.unibo.domain.usecase.currencyrate.ConvertCurrencyUseCaseImpl
+import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
+import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCaseImpl
 
 object UseCaseProvider {
     lateinit var convertCurrencyUseCase: ConvertCurrencyUseCase
