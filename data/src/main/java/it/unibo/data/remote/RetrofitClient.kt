@@ -19,4 +19,8 @@ class RetrofitClient {
     val currencyApi: CurrencyApi by lazy {
         retrofit.create(CurrencyApi::class.java)
     }
+
+    val currencyRateApi: CurrencyRateApi by lazy {
+        retrofit.create(CurrencyRateApi::class.java)
+    }
 }
