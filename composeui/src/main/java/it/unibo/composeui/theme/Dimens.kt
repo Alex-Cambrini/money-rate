@@ -10,7 +10,6 @@ object Dimens {
     val sectionSpacing: Dp = 12.dp
     val elementSpacing: Dp = 8.dp
     val cardPadding: Dp = 12.dp
-    val lazyListSpacing: Dp = 8.dp
     val chartBottomPadding: Dp = 32.dp
 
     // Charts
@@ -23,7 +22,6 @@ object Dimens {
     val donutChartThickness: Dp = 24.dp
     val donutChartSpacing: Dp = 24.dp
     val legendBoxSize: Dp = 12.dp
-    val legendSpacing: Dp = 8.dp
 
     // Bottom connection banner
     val connectionBannerHeight: Dp = 40.dp
