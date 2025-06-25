@@ -25,26 +25,44 @@ class WalletViewModel(
     private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val currencies: StateFlow<List<Pair<String, String>>> = _currencies
 
+    private val _ratesCache = MutableStateFlow<Map<String, Double>>(emptyMap())
+
     init {
         viewModelScope.launch {
+            loadRatesCache()
             _entries.collect { calculateTotalInEuro(it) }
+        }
+    }
+
+    fun convertToEuro(entry: WalletEntry): Double {
+        val rate = _ratesCache.value[entry.currencyCode] ?: return 0.0
+        return entry.amount / rate
+    }
+
+    private fun loadRatesCache() {
+        viewModelScope.launch {
+            val refreshed = currencyRepository.refreshCache()
+            if (refreshed) {
+                val rates = currencyRepository.getCachedRates()
+                _ratesCache.value = rates + ("EUR" to 1.0)
+                calculateTotalInEuro(_entries.value)
+            } else {
+                // gestisci errore o usa cache vecchia
+            }
         }
     }
 
     fun loadCurrencies() {
         viewModelScope.launch {
             val map = currencyRepository.getAvailableCurrencies()
-            println("Currencies loaded: $map")
             _currencies.value = map.toList()
         }
     }
 
-    private suspend fun calculateTotalInEuro(entries: List<WalletEntry>) {
+    private fun calculateTotalInEuro(entries: List<WalletEntry>) {
         var sum = 0.0
         for (entry in entries) {
-            val rate = currencyRepository.getRate(entry.currencyCode, "EUR") ?: continue
-            sum += entry.amount * rate
-        }
+            sum += convertToEuro(entry)        }
         _total.value = sum
     }
 
@@ -67,9 +85,5 @@ class WalletViewModel(
         viewModelScope.launch {
             walletRepository.removeEntry(entry)
         }
-    }
-
-    suspend fun getRateToEuro(currency: String): Double? {
-        return currencyRepository.getRate(currency, "EUR")
     }
 }
