@@ -73,7 +73,7 @@ fun WalletScreen(
         LazyColumn(
             contentPadding = padding,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
