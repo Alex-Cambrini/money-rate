@@ -1,5 +1,6 @@
 package it.unibo.composeui.screens
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,31 +9,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import it.unibo.composeui.viewmodel.HomeViewModel
-import it.unibo.domain.repository.CurrencyRepository
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import it.unibo.composeui.viewmodel.HomeViewModelFactory
-import androidx.compose.foundation.Canvas
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import it.unibo.composeui.theme.Dimens
+import it.unibo.composeui.viewmodel.HomeViewModel
+import it.unibo.composeui.viewmodel.HomeViewModelFactory
 import it.unibo.domain.di.UseCaseProvider
-
+import it.unibo.domain.repository.CurrencyRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(repository: CurrencyRepository) {
     val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(
         UseCaseProvider.getRateUseCase,
-        UseCaseProvider.getAvailableCurrenciesUseCase))
+        UseCaseProvider.getAvailableCurrenciesUseCase
+    ))
     val rate by viewModel.rate.collectAsStateWithLifecycle(initialValue = null)
     val latestRates by viewModel.latestRates.collectAsStateWithLifecycle(emptyMap())
     val scrollState = rememberScrollState()
@@ -48,7 +47,6 @@ fun HomeScreen(repository: CurrencyRepository) {
     var baseExpanded by remember { mutableStateOf(false) }
     var targetExpanded by remember { mutableStateOf(false) }
 
-
     LaunchedEffect(Unit) {
         viewModel.loadCurrencies()
     }
@@ -56,8 +54,7 @@ fun HomeScreen(repository: CurrencyRepository) {
     LaunchedEffect(rate, amount) {
         val currentRate = rate
         val amountDouble = amount.toDoubleOrNull()
-        result =
-            if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
+        result = if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
     }
 
     LaunchedEffect(availableCurrencies) {
@@ -72,89 +69,87 @@ fun HomeScreen(repository: CurrencyRepository) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(Dimens.screenPadding)
                 .fillMaxSize()
                 .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                CurrencyDropdown(
-                    label = "Base Currency",
-                    selectedCurrency = baseCurrency,
-                    expanded = baseExpanded,
-                    onExpandedChange = { expanded ->
-                        baseExpanded = expanded
-                        if (expanded) focusManager.clearFocus(true)
-                    },
-                    onCurrencySelected = {
-                        baseCurrency = it
-                        baseExpanded = false
-                    },
-                    currencies = availableCurrencies,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
+                ) {
+                    CurrencyDropdown(
+                        label = "Base Currency",
+                        selectedCurrency = baseCurrency,
+                        expanded = baseExpanded,
+                        onExpandedChange = { expanded ->
+                            baseExpanded = expanded
+                            if (expanded) focusManager.clearFocus(true)
+                        },
+                        onCurrencySelected = {
+                            baseCurrency = it
+                            baseExpanded = false
+                        },
+                        currencies = availableCurrencies,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                CurrencyDropdown(
-                    label = "Target Currency",
-                    selectedCurrency = targetCurrency,
-                    expanded = targetExpanded,
-                    onExpandedChange = { expanded ->
-                        targetExpanded = expanded
-                        if (expanded) focusManager.clearFocus(true)
+                    CurrencyDropdown(
+                        label = "Target Currency",
+                        selectedCurrency = targetCurrency,
+                        expanded = targetExpanded,
+                        onExpandedChange = { expanded ->
+                            targetExpanded = expanded
+                            if (expanded) focusManager.clearFocus(true)
+                        },
+                        onCurrencySelected = {
+                            targetCurrency = it
+                            targetExpanded = false
+                        },
+                        currencies = availableCurrencies,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(Dimens.elementSpacing))
+
+                Button(
+                    onClick = {
+                        val oldBase = baseCurrency
+                        val oldTarget = targetCurrency
+                        baseCurrency = oldTarget
+                        targetCurrency = oldBase
+                        viewModel.loadRate(oldTarget, oldBase)
                     },
-                    onCurrencySelected = {
-                        targetCurrency = it
-                        targetExpanded = false
-                    },
-                    currencies = availableCurrencies,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Icon(Icons.Filled.SwapVert, contentDescription = "Swap currencies")
+                }
             }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Button(
-                onClick = {
-                    val oldBase = baseCurrency
-                    val oldTarget = targetCurrency
-                    baseCurrency = oldTarget
-                    targetCurrency = oldBase
-                    viewModel.loadRate(oldTarget, oldBase)
-                },modifier = Modifier
-                    .wrapContentSize()
-                    .align(Alignment.CenterVertically)
-            ) {
-                Icon(Icons.Filled.SwapVert, contentDescription = "Swap currencies")
-            }
-        }
 
             AmountInput(amount) { newValue ->
                 if (newValue.all { it.isDigit() || it == '.' }) amount = newValue
             }
 
             ConvertButton(
-
                 enabled = amount.toDoubleOrNull() != null,
-
-                onClick = {
-
-                    viewModel.loadRate(baseCurrency, targetCurrency)
-
-                }
-
+                onClick = { viewModel.loadRate(baseCurrency, targetCurrency) }
             )
 
             ResultDisplay(result, amount, baseCurrency, targetCurrency)
+
             if (latestRates.isNotEmpty()) {
                 Text(
                     text = "Valute ordinate per forza (riferite a 1 EUR)",
                     style = MaterialTheme.typography.titleMedium
                 )
+
                 val top10Rates = latestRates.entries
                     .sortedBy { it.value }
                     .take(10)
@@ -178,21 +173,30 @@ fun CurrencyDropdown(
     modifier: Modifier = Modifier
 ) {
     ExposedDropdownMenuBox(
-        expanded = expanded, onExpandedChange = onExpandedChange, modifier = modifier
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        modifier = modifier
     ) {
-        TextField(value = selectedCurrency,
+        TextField(
+            value = selectedCurrency,
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor()
         )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) }
+        ) {
             currencies.forEach { (code, name) ->
-                DropdownMenuItem(text = { Text("$code - $name") }, onClick = {
-                    onCurrencySelected(code)
-                    onExpandedChange(false)
-                })
+                DropdownMenuItem(
+                    text = { Text("$code - $name") },
+                    onClick = {
+                        onCurrencySelected(code)
+                        onExpandedChange(false)
+                    }
+                )
             }
         }
     }
@@ -213,7 +217,9 @@ fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
 @Composable
 fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
     Button(
-        onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth()
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text("Convert")
     }
@@ -241,13 +247,13 @@ fun CurrencyBarChart(rates: Map<String, Double>) {
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .height(280.dp)
-            .padding(horizontal = 16.dp)
+            .height(Dimens.barChartHeight)
+            .padding(horizontal = Dimens.barChartHorizontalPadding)
     ) {
         val count = sortedRates.size
         val barWidth = size.width / (count * 1.5f)
         val spacing = (size.width - barWidth * count) / (count + 1)
-        val maxHeight = size.height - 32.dp.toPx()
+        val maxHeight = size.height - Dimens.chartBottomPadding.toPx()
 
         sortedRates.forEachIndexed { i, (currency, rate) ->
             val normalized = (rate / maxRate).toFloat()
@@ -265,12 +271,12 @@ fun CurrencyBarChart(rates: Map<String, Double>) {
 
             val paintLabel = android.graphics.Paint().apply {
                 textAlign = android.graphics.Paint.Align.CENTER
-                textSize = 24f
+                textSize = Dimens.BAR_LABEL_TEXT_SIZE
             }
 
             val paintValue = android.graphics.Paint().apply {
                 textAlign = android.graphics.Paint.Align.CENTER
-                textSize = 22f
+                textSize = Dimens.BAR_VALUE_TEXT_SIZE
             }
 
             drawContext.canvas.nativeCanvas.drawText(
