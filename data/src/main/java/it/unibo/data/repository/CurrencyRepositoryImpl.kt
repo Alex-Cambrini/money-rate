@@ -16,7 +16,10 @@ class CurrencyRepositoryImpl(
         private const val CACHE_BASE = "EUR"
     }
 
-
+    override suspend fun getCachedRates(): Map<String, Double> {
+        val rates = dao.getRatesByBase(CACHE_BASE)
+        return rates.associate { it.currencyCode to it.rate }
+    }
 
     override suspend fun getRate(from: String, to: String): Double? {
         if (from == to) return 1.0
@@ -71,12 +74,5 @@ class CurrencyRepositoryImpl(
 
     private fun ExchangeRatesResponse.toEntities() = rates.map { (currency, rate) ->
         CurrencyRateEntity(currencyCode = currency, rate = rate, base = base, timestamp = System.currentTimeMillis())
-    }
-
-    override suspend fun getAllRatesToEuro(): Map<String, Double> {
-        if (!refreshCache()) return emptyMap()
-
-        val rates = dao.getRatesByBase(CACHE_BASE)
-        return rates.associate { it.currencyCode to it.rate }
     }
 }
