@@ -2,14 +2,14 @@ package it.unibo.composeui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.unibo.domain.usecase.currencyrate.ConvertCurrencyUseCase
 import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
+import it.unibo.domain.usecase.currencyrate.GetRateUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val convertCurrencyUseCase: ConvertCurrencyUseCase,
+    private val getRateUseCase: GetRateUseCase,
     private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase
 ) : ViewModel() {
     private val _rate = MutableStateFlow<Double?>(null)
@@ -21,7 +21,7 @@ class HomeViewModel(
 
     fun loadRate(base: String = "EUR", to: String) {
         viewModelScope.launch {
-            val currencyRate = convertCurrencyUseCase.invoke(base, to)
+            val currencyRate = getRateUseCase.invoke(base, to)
             _rate.value = currencyRate.rate
         }
     }
@@ -37,7 +37,7 @@ class HomeViewModel(
         viewModelScope.launch {
             val result = mutableMapOf<String, Double>()
             for (target in targets) {
-                val rate = convertCurrencyUseCase.invoke("EUR", target).rate
+                val rate = getRateUseCase.invoke("EUR", target).rate
                 if (rate != 0.0) result[target] = rate
             }
             _latestRates.value = result
