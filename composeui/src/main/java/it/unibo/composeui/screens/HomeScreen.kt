@@ -31,7 +31,7 @@ import it.unibo.domain.di.UseCaseProvider
 @Composable
 fun HomeScreen(repository: CurrencyRepository) {
     val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(
-        UseCaseProvider.convertCurrencyUseCase,
+        UseCaseProvider.getRateUseCase,
         UseCaseProvider.getAvailableCurrenciesUseCase))
     val rate by viewModel.rate.collectAsStateWithLifecycle(initialValue = null)
     val latestRates by viewModel.latestRates.collectAsStateWithLifecycle(emptyMap())
