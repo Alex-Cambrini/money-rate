@@ -2,6 +2,7 @@ package it.unibo.composeui.theme
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 object Dimens {
     // General padding and spacing
@@ -25,4 +26,9 @@ object Dimens {
 
     // Bottom connection banner
     val connectionBannerHeight: Dp = 40.dp
+
+    // Splash screen
+    val splashTitleSize = 36.sp
+    val splashSpacerHeight = 24.dp
+
 }
