@@ -24,12 +24,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
+import it.unibo.domain.di.UseCaseProvider
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(repository: CurrencyRepository) {
-    val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(repository))
+    val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(
+        UseCaseProvider.convertCurrencyUseCase,
+        UseCaseProvider.getAvailableCurrenciesUseCase))
     val rate by viewModel.rate.collectAsStateWithLifecycle(initialValue = null)
     val latestRates by viewModel.latestRates.collectAsStateWithLifecycle(emptyMap())
     val scrollState = rememberScrollState()
