@@ -2,17 +2,17 @@ package it.unibo.composeui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import it.unibo.domain.usecase.currencyrate.ConvertCurrencyUseCase
 import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
+import it.unibo.domain.usecase.currencyrate.GetRateUseCase
 
 class HomeViewModelFactory(
-    private val convertCurrencyUseCase: ConvertCurrencyUseCase,
+    private val getRateUseCase: GetRateUseCase,
     private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(convertCurrencyUseCase, getAvailableCurrenciesUseCase) as T
+            return HomeViewModel(getRateUseCase, getAvailableCurrenciesUseCase) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
