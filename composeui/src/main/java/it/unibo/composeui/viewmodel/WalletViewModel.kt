@@ -1,17 +1,16 @@
 package it.unibo.composeui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import it.unibo.domain.model.WalletEntry
-import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.domain.repository.WalletRepository
+import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class WalletViewModel(
-    private val currencyRepository: CurrencyRepository,
-    private val walletRepository: WalletRepository
+    private val currencyUseCase: GetAvailableCurrenciesUseCase,
+    private val walletRepository: WalletRepository // TODO: implement use case
 ) : ViewModel() {
 
     private val _entries = walletRepository.getAllEntries()
