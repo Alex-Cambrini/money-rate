@@ -35,7 +35,6 @@ fun MainScreen(
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             ConnectionStatusBanner(viewModel)
-            Spacer(modifier = Modifier.height(40.dp))
             NavHost(
                 navController = navController,
                 startDestination = "home",
