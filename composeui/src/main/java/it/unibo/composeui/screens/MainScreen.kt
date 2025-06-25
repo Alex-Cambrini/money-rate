@@ -1,12 +1,6 @@
 package it.unibo.composeui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Wallet
@@ -29,16 +23,18 @@ fun MainScreen(
     val navController = rememberNavController()
     val viewModel: MainViewModel = viewModel(factory = MainViewModelFactory(repositoryProvider.networkChecker))
 
-
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            ConnectionStatusBanner(viewModel)
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
             NavHost(
                 navController = navController,
                 startDestination = "home",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxSize()
             ) {
                 composable("home") {
                     HomeScreen(repositoryProvider.currencyRepository)
@@ -50,6 +46,11 @@ fun MainScreen(
                     )
                 }
             }
+            ConnectionStatusBanner(
+                viewModel = viewModel,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+            )
         }
     }
 }
@@ -76,13 +77,13 @@ fun BottomNavigationBar(navController: NavHostController) {
 }
 
 @Composable
-fun ConnectionStatusBanner(viewModel: MainViewModel) {
+fun ConnectionStatusBanner(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val isConnected by viewModel.isConnected.collectAsState()
 
     if (!isConnected) {
         Surface(
             color = MaterialTheme.colorScheme.error,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .height(40.dp),
         ) {
