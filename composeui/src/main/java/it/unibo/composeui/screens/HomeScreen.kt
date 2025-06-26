@@ -2,6 +2,7 @@ package it.unibo.composeui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,6 +21,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import it.unibo.composeui.resources.Strings
+import it.unibo.composeui.theme.Background
+import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
 import it.unibo.composeui.viewmodel.HomeViewModelFactory
@@ -173,6 +177,10 @@ fun CurrencyDropdown(
     currencies: List<Pair<String, String>>,
     modifier: Modifier = Modifier
 ) {
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) DarkBackground else Background
+    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = onExpandedChange,
@@ -186,24 +194,25 @@ fun CurrencyDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface
+                focusedContainerColor = backgroundColor,
+                unfocusedContainerColor = backgroundColor,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor,
+                focusedLabelColor = textColor,
+                unfocusedLabelColor = textColor,
+                focusedTrailingIconColor = textColor,
+                unfocusedTrailingIconColor = textColor
             )
         )
+
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) },
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            modifier = Modifier.background(backgroundColor)
         ) {
             currencies.forEach { (code, name) ->
                 DropdownMenuItem(
-                    text = { Text("$code - $name") },
+                    text = { Text("$code - $name", color = textColor) },
                     onClick = {
                         onCurrencySelected(code)
                         onExpandedChange(false)
@@ -217,21 +226,25 @@ fun CurrencyDropdown(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) DarkBackground else Background
+    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+
     TextField(
         value = amount,
         onValueChange = onAmountChange,
-        label = { Text("Amount") },
+        label = { Text(Strings.AMOUNT, color = textColor) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
-            focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface
+            focusedContainerColor = backgroundColor,
+            unfocusedContainerColor = backgroundColor,
+            focusedTextColor = textColor,
+            unfocusedTextColor = textColor,
+            focusedLabelColor = textColor,
+            unfocusedLabelColor = textColor,
+            focusedTrailingIconColor = textColor,
+            unfocusedTrailingIconColor = textColor
         )
     )
 }
@@ -243,7 +256,7 @@ fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
         enabled = enabled,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text("Convert")
+        Text(Strings.CONVERT)
     }
 }
 
