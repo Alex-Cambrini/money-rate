@@ -22,7 +22,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.Dimens
+import it.unibo.composeui.theme.LightPrimaryBackground
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.composeui.viewmodel.WalletViewModelFactory
 import it.unibo.domain.model.WalletEntry
@@ -266,10 +268,16 @@ fun AddWalletDialog(
                 )
                 TextField(
                     value = amountText,
-                    onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) amountText = it },
+                    onValueChange = {
+                        if (it.all { ch -> ch.isDigit() || ch == '.' }) amountText = it
+                    },
                     label = { Text("Amount") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = LightPrimaryBackground,
+                        unfocusedContainerColor = LightPrimaryBackground
+                    )
                 )
             }
         },
@@ -289,7 +297,8 @@ fun AddWalletDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
-        }
+        },
+        containerColor = Background
     )
 }
 
@@ -307,10 +316,16 @@ fun EditWalletDialog(
         text = {
             TextField(
                 value = amountText,
-                onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it },
+                onValueChange = {
+                    if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it
+                },
                 label = { Text("Delta (+/-)") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = LightPrimaryBackground,
+                    unfocusedContainerColor = LightPrimaryBackground
+                )
             )
         },
         confirmButton = {
@@ -329,7 +344,8 @@ fun EditWalletDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
-        }
+        },
+        containerColor = Background
     )
 }
 
@@ -351,7 +367,8 @@ fun ConfirmDeleteDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
-        }
+        },
+        containerColor = Background
     )
 }
 
@@ -376,7 +393,11 @@ fun DropdownMenuCurrencySelector(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = LightPrimaryBackground,
+                unfocusedContainerColor = LightPrimaryBackground
+            )
         )
         ExposedDropdownMenu(
             expanded = expanded,
