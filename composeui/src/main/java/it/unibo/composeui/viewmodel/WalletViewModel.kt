@@ -11,6 +11,7 @@ import it.unibo.domain.usecase.wallet.AddEntryUseCase
 import it.unibo.domain.usecase.wallet.GetAllEntriesUseCase
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
 import it.unibo.domain.usecase.wallet.UpdateEntryUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -60,7 +61,7 @@ class WalletViewModel(
     }
 
     fun loadRatesCache() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 refreshCacheUseCase.invoke()
             } catch (_: Exception) { }
@@ -70,7 +71,7 @@ class WalletViewModel(
     }
 
     fun loadCurrencies() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val map = getAvailableCurrenciesUseCase.invoke()
             _currencies.value = map.toList()
         }
@@ -94,7 +95,7 @@ class WalletViewModel(
     }
 
     fun addWallet(currency: String, amount: Double) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val name = _currencies.value.find { it.first == currency }?.second ?: currency
             val newEntry = WalletEntry(id = 0, currencyCode = currency, currencyName = name, amount = amount)
             addEntryUseCase.invoke(newEntry)
@@ -102,14 +103,14 @@ class WalletViewModel(
     }
 
     fun modifyWallet(entry: WalletEntry, delta: Double) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val updated = entry.copy(amount = entry.amount + delta)
             updateEntryUseCase.invoke(updated)
         }
     }
 
     fun deleteWallet(entry: WalletEntry) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             removeEntryUseCase.invoke(entry)
         }
     }
