@@ -31,14 +31,11 @@ class CurrencyRateRepositoryImpl(
                 else -> null
             }
         }
-
-        // Nessuno è EUR: chiamata API diretta senza cache
         val response = try {
             api.getLatestRates(from = from, to = to)
         } catch (e: Exception) {
             return null
         }
-
         return response.rates[to]
     }
 
@@ -52,6 +49,7 @@ class CurrencyRateRepositoryImpl(
 
         return try {
             val response = api.getLatestRates(from = CACHE_BASE, to = null)
+            dao.clearRatesByBase(CACHE_BASE)
             dao.insertRates(response.toEntities())
             true
         } catch (e: Exception) {

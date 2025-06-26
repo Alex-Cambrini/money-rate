@@ -17,6 +17,6 @@ interface CurrencyRateDao {
     @Query("SELECT rate FROM currency_rates WHERE base = :base AND currencyCode = :toCurrency LIMIT 1")
     suspend fun getRate(base: String, toCurrency: String): Double?
 
-    @Query("DELETE FROM currency_rates WHERE timestamp < :expiryTime")
-    suspend fun deleteOldRates(expiryTime: Long)
+    @Query("DELETE FROM currency_rates WHERE base = :base")
+    suspend fun clearRatesByBase(base: String)
 }
