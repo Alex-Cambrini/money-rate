@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
@@ -22,7 +21,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.theme.Dimens
-import it.unibo.composeui.theme.LightPrimaryBackground
 import it.unibo.composeui.viewmodel.HomeViewModel
 import it.unibo.composeui.viewmodel.HomeViewModelFactory
 import it.unibo.domain.di.UseCaseProvider
