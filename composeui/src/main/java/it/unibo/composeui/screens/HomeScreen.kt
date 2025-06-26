@@ -149,7 +149,7 @@ fun HomeScreen(repository: CurrencyRepository) {
 
             if (latestRates.isNotEmpty()) {
                 Text(
-                    text = "Valute ordinate per forza (riferite a 1 EUR)",
+                    text = "Currencies ordered by strength (based on 1 EUR)",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -188,14 +188,20 @@ fun CurrencyDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = LightPrimaryBackground,
-                unfocusedContainerColor = LightPrimaryBackground
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface
             )
         )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) },
-            modifier = Modifier.background(Color.White)
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
             currencies.forEach { (code, name) ->
                 DropdownMenuItem(
@@ -220,8 +226,14 @@ fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = LightPrimaryBackground,
-            unfocusedContainerColor = LightPrimaryBackground
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+            focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }
