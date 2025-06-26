@@ -12,7 +12,7 @@ import it.unibo.data.local.entity.WalletEntryEntity
 import it.unibo.data.local.entity.CurrencyEntity
 
 
-@Database(entities = [CurrencyEntity::class, CurrencyRateEntity::class, WalletEntryEntity::class], version = 7, exportSchema = false)
+@Database(entities = [CurrencyEntity::class, CurrencyRateEntity::class, WalletEntryEntity::class], version = 8, exportSchema = false)
 
 abstract class AppDatabase : RoomDatabase() {
     abstract fun currencyRateDao(): CurrencyRateDao
