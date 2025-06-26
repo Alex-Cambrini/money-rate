@@ -3,6 +3,7 @@ package it.unibo.composeui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.domain.model.WalletEntry
+import it.unibo.domain.model.WrappedWalletData
 import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
 import it.unibo.domain.usecase.currencyrate.GetCachedRatesUseCase
 import it.unibo.domain.usecase.currencyrate.RefreshCacheUseCase
@@ -27,7 +28,15 @@ class WalletViewModel(
         .invoke()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    val entries: StateFlow<List<WalletEntry>> = _entries
+    private val _ratesCache = MutableStateFlow<Map<String, Double>>(emptyMap())
+
+    val combinedData: StateFlow<WrappedWalletData> = combine(
+        _entries,
+        _ratesCache
+    ) { entries, ratesCache ->
+        WrappedWalletData(entries, ratesCache)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, WrappedWalletData(emptyList(), emptyMap()))
+
 
     private val _total = MutableStateFlow(0.0)
     val total: StateFlow<Double> = _total
@@ -35,23 +44,28 @@ class WalletViewModel(
     private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val currencies: StateFlow<List<Pair<String, String>>> = _currencies
 
-    private val _ratesCache = MutableStateFlow<Map<String, Double>>(emptyMap())
-
     init {
         viewModelScope.launch {
             loadRatesCache()
-            _entries.collect { calculateTotalInEuro(it) }
+        }
+        viewModelScope.launch {
+            combinedData.collect { data ->
+                if (data.ratesCache.isNotEmpty()) {
+                    calculateTotalInEuro(data.entries, data.ratesCache)
+                } else {
+                    _total.value = 0.0
+                }
+            }
         }
     }
 
-    private fun loadRatesCache() {
+    fun loadRatesCache() {
         viewModelScope.launch {
-            val refreshed = refreshCacheUseCase.invoke()
-            if (refreshed) {
-                val rates = getCachedRatesUseCase.invoke()
-                _ratesCache.value = rates + ("EUR" to 1.0)
-                calculateTotalInEuro(_entries.value)
-            }
+            try {
+                refreshCacheUseCase.invoke()
+            } catch (_: Exception) { }
+            val rates = getCachedRatesUseCase.invoke()
+            _ratesCache.value = rates + ("EUR" to 1.0)
         }
     }
 
@@ -62,17 +76,21 @@ class WalletViewModel(
         }
     }
 
-    private fun calculateTotalInEuro(entries: List<WalletEntry>) {
+    private fun calculateTotalInEuro(entries: List<WalletEntry>, rates: Map<String, Double>) {
         var sum = 0.0
         for (entry in entries) {
-            sum += convertToEuro(entry)
+            sum += convertToEuro(entry, rates)
         }
         _total.value = sum
     }
 
-    fun convertToEuro(entry: WalletEntry): Double {
-        val rate = _ratesCache.value[entry.currencyCode] ?: return 0.0
-        return entry.amount / rate
+    fun convertToEuro(entry: WalletEntry, rates: Map<String, Double>): Double {
+        val rate = rates[entry.currencyCode]
+        if (rate == null) {
+            return 0.0
+        }
+        val euroValue = entry.amount / rate
+        return euroValue
     }
 
     fun addWallet(currency: String, amount: Double) {
