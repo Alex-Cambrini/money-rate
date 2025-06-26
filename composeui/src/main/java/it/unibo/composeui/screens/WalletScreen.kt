@@ -79,7 +79,7 @@ fun WalletScreen(
     var deleteEntryId by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(Unit) {
-        println("DEBUG: WalletScreen LaunchedEffect(Unit) chiamato.")
+        println("DEBUG: WalletScreen LaunchedEffect(Unit) called.")
         viewModel.loadCurrencies()
         viewModel.loadRatesCache()
     }
