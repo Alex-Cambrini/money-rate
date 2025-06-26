@@ -13,8 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -244,6 +244,10 @@ fun CurrencyBarChart(rates: Map<String, Double>) {
         .take(5)
     val maxRate = sortedRates.maxOf { it.value }
 
+    val barColor = MaterialTheme.colorScheme.primary
+    val highlightColor = MaterialTheme.colorScheme.error
+    val textColor = MaterialTheme.colorScheme.onBackground.toArgb()
+
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
@@ -261,7 +265,7 @@ fun CurrencyBarChart(rates: Map<String, Double>) {
             val x = spacing + i * (barWidth + spacing)
             val y = maxHeight - height
 
-            val color = if (rate == maxRate) Color.Red else Color(0xFF90CAF9)
+            val color = if (rate == maxRate) highlightColor else barColor
 
             drawRect(
                 color = color,
@@ -272,12 +276,16 @@ fun CurrencyBarChart(rates: Map<String, Double>) {
             val paintLabel = android.graphics.Paint().apply {
                 textAlign = android.graphics.Paint.Align.CENTER
                 textSize = Dimens.BAR_LABEL_TEXT_SIZE
+                isAntiAlias = true
             }
+            paintLabel.color = textColor
 
             val paintValue = android.graphics.Paint().apply {
                 textAlign = android.graphics.Paint.Align.CENTER
                 textSize = Dimens.BAR_VALUE_TEXT_SIZE
+                isAntiAlias = true
             }
+            paintValue.color = textColor
 
             drawContext.canvas.nativeCanvas.drawText(
                 currency,
