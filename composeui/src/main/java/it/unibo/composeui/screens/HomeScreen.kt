@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.theme.Dimens
+import it.unibo.composeui.theme.LightPrimaryBackground
 import it.unibo.composeui.viewmodel.HomeViewModel
 import it.unibo.composeui.viewmodel.HomeViewModelFactory
 import it.unibo.domain.di.UseCaseProvider
@@ -183,7 +184,11 @@ fun CurrencyDropdown(
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor()
+            modifier = Modifier.menuAnchor(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = LightPrimaryBackground,
+                unfocusedContainerColor = LightPrimaryBackground
+            )
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -210,7 +215,11 @@ fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
         onValueChange = onAmountChange,
         label = { Text("Amount") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = LightPrimaryBackground,
+            unfocusedContainerColor = LightPrimaryBackground
+        )
     )
 }
 
