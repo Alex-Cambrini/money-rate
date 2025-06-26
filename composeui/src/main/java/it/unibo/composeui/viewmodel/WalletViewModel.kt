@@ -86,10 +86,7 @@ class WalletViewModel(
     }
 
     fun convertToEuro(entry: WalletEntry, rates: Map<String, Double>): Double {
-        val rate = rates[entry.currencyCode]
-        if (rate == null) {
-            return 0.0
-        }
+        val rate = rates[entry.currencyCode] ?: return 0.0
         val euroValue = entry.amount / rate
         return euroValue
     }
