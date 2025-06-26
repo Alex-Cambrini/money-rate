@@ -18,9 +18,11 @@ class RepositoryProviderImpl(private val context: Context) : RepositoryProvider 
     private val retrofitClient = RetrofitClient()
     private val database = AppDatabase.getInstance(context)
     private val currencyRateDao = database.currencyRateDao()
+    private val currencyDao = database.currencyDao()
     private val walletDao = database.walletDao()
 
     override var currencyRepository: CurrencyRepository = CurrencyRepositoryImpl(
+        dao = currencyDao,
         api = retrofitClient.currencyApi
     )
     override val currencyRateRepository: CurrencyRateRepository = CurrencyRateRepositoryImpl(
