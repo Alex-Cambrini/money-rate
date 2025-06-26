@@ -15,7 +15,7 @@ val Tertiary = Color(0xFFF57C00)
 val OnTertiary = Color(0xFFFFFFFF)
 val TertiaryContainer = Color(0xFFFFE0B2)
 
-val Background = Color(0xFFFFFFFF)
+val Background = Color(0xFFEEEEEE)
 val OnBackground = Color(0xFF000000)
 val Surface = Color(0xFFFFFFFF)
 val OnSurface = Color(0xFF000000)
@@ -23,8 +23,11 @@ val OnSurface = Color(0xFF000000)
 val Error = Color(0xFFD32F2F)
 val OnError = Color(0xFFFFFFFF)
 
+val LightPrimaryBackground = Color(0xFFE3F2FD)
+
 // Dark theme overrides
 val DarkBackground = Color(0xFF121212)
 val DarkOnBackground = Color.White
 val DarkSurface = Color(0xFF1E1E1E)
 val DarkOnSurface = Color.White
+val DarkSecondaryContainer = Color(0xFF1976D2)
