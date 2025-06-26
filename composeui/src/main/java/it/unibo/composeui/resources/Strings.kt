@@ -29,4 +29,5 @@ object Strings {
     const val HOME_DESCRIPTION = "Home"
     const val WALLET_DESCRIPTION = "Wallet"
     const val SPLASH_TITLE = "MoneyRate"
+    const val TOTAL_VALUE_FORMAT = "Total Value: %.2f€"
 }
