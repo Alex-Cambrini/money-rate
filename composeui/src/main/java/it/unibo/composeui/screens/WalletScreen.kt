@@ -39,6 +39,7 @@ import it.unibo.domain.usecase.wallet.AddEntryUseCaseImpl
 import it.unibo.domain.usecase.wallet.GetAllEntriesUseCaseImpl
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCaseImpl
 import it.unibo.domain.usecase.wallet.UpdateEntryUseCaseImpl
+import it.unibo.composeui.resources.Strings
 
 @Composable
 fun WalletScreen(
@@ -91,7 +92,7 @@ fun WalletScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Wallet")
+                Icon(Icons.Default.Add, contentDescription = Strings.ADD_WALLET_DESCRIPTION)
             }
         }
     ) { padding ->
@@ -104,7 +105,7 @@ fun WalletScreen(
         ) {
             item {
                 Text(
-                    text = "Total Value: ${"%.2f".format(total)}€",
+                    text = Strings.TOTAL_VALUE_FORMAT.format(total),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -153,9 +154,15 @@ fun WalletScreen(
 
             item {
                 if (entries.isEmpty()) {
-                    Text("No wallets available.", color = MaterialTheme.colorScheme.onBackground)
+                    Text(
+                        text = Strings.NO_WALLETS,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 } else {
-                    Text("Wallets", style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = Strings.WALLETS,
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
             }
 
@@ -196,10 +203,10 @@ fun WalletScreen(
                         ) {
                             Row {
                                 IconButton(onClick = { editEntryId = item.id }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                    Icon(Icons.Default.Edit, contentDescription = Strings.EDIT_DESCRIPTION)
                                 }
                                 IconButton(onClick = { deleteEntryId = item.id }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                    Icon(Icons.Default.Delete, contentDescription = Strings.DELETE_DESCRIPTION)
                                 }
                             }
                         }
@@ -255,9 +262,13 @@ fun AddWalletDialog(
     var selectedCurrency by remember { mutableStateOf(availableCurrencies.firstOrNull()?.first.orEmpty()) }
     var amountText by remember { mutableStateOf("") }
 
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) DarkBackground else Background
+    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Wallet") },
+        title = { Text(Strings.ADD_WALLET, color = textColor) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)) {
                 DropdownMenuCurrencySelector(
@@ -272,38 +283,36 @@ fun AddWalletDialog(
                     onValueChange = {
                         if (it.all { ch -> ch.isDigit() || ch == '.' }) amountText = it
                     },
-                    label = { Text("Amount") },
+                    label = { Text(Strings.AMOUNT, color = textColor) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                        focusedContainerColor = backgroundColor,
+                        unfocusedContainerColor = backgroundColor,
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        focusedLabelColor = textColor,
+                        unfocusedLabelColor = textColor
                     )
                 )
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    val amount = amountText.toDoubleOrNull()
-                    if (amount != null && selectedCurrency.isNotBlank()) {
-                        onConfirm(selectedCurrency, amount)
-                    }
+            TextButton(onClick = {
+                val amount = amountText.toDoubleOrNull()
+                if (amount != null && selectedCurrency.isNotBlank()) {
+                    onConfirm(selectedCurrency, amount)
                 }
-            ) {
-                Text("Confirm")
+            }) {
+                Text(Strings.CONFIRM, color = textColor)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(Strings.CANCEL, color = textColor)
             }
         },
-        containerColor = if (isSystemInDarkTheme()) DarkBackground else Background
+        containerColor = backgroundColor
     )
 }
 
@@ -315,25 +324,29 @@ fun EditWalletDialog(
 ) {
     var amountText by remember { mutableStateOf(initialAmount.toString()) }
 
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) DarkBackground else Background
+    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit Amount") },
+        title = { Text(Strings.EDIT_AMOUNT, color = textColor) },
         text = {
             TextField(
                 value = amountText,
                 onValueChange = {
                     if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it
                 },
-                label = { Text("Delta (+/-)") },
+                label = { Text(Strings.DELTA, color = textColor) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                    focusedContainerColor = backgroundColor,
+                    unfocusedContainerColor = backgroundColor,
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor,
+                    focusedLabelColor = textColor,
+                    unfocusedLabelColor = textColor
                 )
             )
         },
@@ -346,15 +359,15 @@ fun EditWalletDialog(
                     }
                 }
             ) {
-                Text("Save")
+                Text(Strings.SAVE, color = textColor)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(Strings.CANCEL, color = textColor)
             }
         },
-        containerColor = if (isSystemInDarkTheme()) DarkBackground else Background
+        containerColor = backgroundColor
     )
 }
 
@@ -363,21 +376,25 @@ fun ConfirmDeleteDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) DarkBackground else Background
+    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete Wallet") },
-        text = { Text("Are you sure you want to delete this wallet?") },
+        title = { Text(Strings.DELETE_WALLET, color = textColor) },
+        text = { Text(Strings.CONFIRM_DELETE_WALLET, color = textColor) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Delete")
+                Text(Strings.DELETE_DESCRIPTION, color = textColor)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(Strings.CANCEL, color = textColor)
             }
         },
-        containerColor = if (isSystemInDarkTheme()) DarkBackground else Background
+        containerColor = backgroundColor
     )
 }
 
@@ -390,6 +407,10 @@ fun DropdownMenuCurrencySelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) DarkBackground else Background
+    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it }
@@ -398,30 +419,31 @@ fun DropdownMenuCurrencySelector(
             value = selected,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Currency") },
+            label = { Text(Strings.CURRENCY, color = textColor) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface
+                focusedContainerColor = backgroundColor,
+                unfocusedContainerColor = backgroundColor,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor,
+                focusedLabelColor = textColor,
+                unfocusedLabelColor = textColor,
+                focusedTrailingIconColor = textColor,
+                unfocusedTrailingIconColor = textColor
             )
         )
+
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            modifier = Modifier.background(backgroundColor)
         ) {
             currencies.forEach { currency ->
                 DropdownMenuItem(
-                    text = { Text(currency) },
+                    text = { Text(currency, color = textColor) },
                     onClick = {
                         onSelected(currency)
                         expanded = false
