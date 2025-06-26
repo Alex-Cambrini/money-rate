@@ -13,13 +13,20 @@ class CurrencyUpdateWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        Log.d("CurrencyUpdateWorker", "Worker started")
+        Log.d("CurrencyUpdateWorker", "Worker started - attempting refresh of currency cache.") // Log iniziale più specifico
         val repository: CurrencyRateRepository = RepositoryProviderImpl(context).currencyRateRepository
 
         return try {
             val success = repository.refreshCache()
-            if (success) Result.success() else Result.retry()
+            if (success) {
+                Log.d("CurrencyUpdateWorker", "Refresh cache SUCCESS! Worker completed.") // Log in caso di successo
+                Result.success()
+            } else {
+                Log.e("CurrencyUpdateWorker", "Refresh cache FAILED: repository.refreshCache() returned false. Retrying.") // Log se refreshCache() restituisce false
+                Result.retry()
+            }
         } catch (e: Exception) {
+            Log.e("CurrencyUpdateWorker", "Refresh cache EXCEPTION: An error occurred during refresh. Retrying.", e) // Log in caso di eccezione, con stack trace
             Result.retry()
         }
     }
