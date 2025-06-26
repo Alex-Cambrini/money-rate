@@ -55,7 +55,10 @@ fun WalletScreen(
         )
     )
 
-    val entries by viewModel.entries.collectAsState()
+    val combinedData by viewModel.combinedData.collectAsStateWithLifecycle()
+    val entries = combinedData.entries
+    val rates = combinedData.ratesCache
+
     val total by viewModel.total.collectAsState()
     val currencies: List<Pair<String, String>> by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
 
@@ -73,7 +76,9 @@ fun WalletScreen(
     var deleteEntryId by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(Unit) {
+        println("DEBUG: WalletScreen LaunchedEffect(Unit) chiamato.")
         viewModel.loadCurrencies()
+        viewModel.loadRatesCache()
     }
 
     Scaffold(
@@ -112,12 +117,17 @@ fun WalletScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(Dimens.donutChartSpacing)
                     ) {
-                        WalletDonutChart(
-                            entries = entries,
-                            modifier = Modifier.size(Dimens.donutChartSize),
-                            size = Dimens.donutChartSize,
-                            thickness = Dimens.donutChartThickness
-                        )
+                        if (rates.isNotEmpty()) {
+                            WalletDonutChart(
+                                entries = entries,
+                                modifier = Modifier.size(Dimens.donutChartSize),
+                                size = Dimens.donutChartSize,
+                                thickness = Dimens.donutChartThickness
+                            )
+                        } else {
+                            CircularProgressIndicator(modifier = Modifier.size(Dimens.donutChartSize))
+                        }
+
 
                         Column(
                             verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
@@ -169,7 +179,11 @@ fun WalletScreen(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
-                            val euroValue = viewModel.convertToEuro(item)
+                            val euroValue = if (rates.isNotEmpty()) {
+                                viewModel.convertToEuro(item, rates)
+                            } else {
+                                0.0
+                            }
                             Text("%.2f€".format(euroValue), style = MaterialTheme.typography.bodySmall)
                         }
                         Column(
