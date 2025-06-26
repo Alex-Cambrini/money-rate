@@ -1,6 +1,7 @@
 package it.unibo.moneyrate.worker
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import it.unibo.data.di.RepositoryProviderImpl
@@ -12,6 +13,7 @@ class CurrencyUpdateWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        Log.d("CurrencyUpdateWorker", "Worker started")
         val repository: CurrencyRateRepository = RepositoryProviderImpl(context).currencyRateRepository
 
         return try {
