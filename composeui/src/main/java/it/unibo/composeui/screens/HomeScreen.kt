@@ -88,7 +88,7 @@ fun HomeScreen(repository: CurrencyRepository) {
                     verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
                 ) {
                     CurrencyDropdown(
-                        label = "Base Currency",
+                        label = Strings.BASE_CURRENCY,
                         selectedCurrency = baseCurrency,
                         expanded = baseExpanded,
                         onExpandedChange = { expanded ->
@@ -104,7 +104,7 @@ fun HomeScreen(repository: CurrencyRepository) {
                     )
 
                     CurrencyDropdown(
-                        label = "Target Currency",
+                        label = Strings.TARGET_CURRENCY,
                         selectedCurrency = targetCurrency,
                         expanded = targetExpanded,
                         onExpandedChange = { expanded ->
@@ -134,7 +134,7 @@ fun HomeScreen(repository: CurrencyRepository) {
                         .wrapContentSize()
                         .align(Alignment.CenterVertically)
                 ) {
-                    Icon(Icons.Filled.SwapVert, contentDescription = "Swap currencies")
+                    Icon(Icons.Filled.SwapVert, contentDescription = Strings.SWAP_CURRENCIES)
                 }
             }
 
@@ -151,7 +151,7 @@ fun HomeScreen(repository: CurrencyRepository) {
 
             if (latestRates.isNotEmpty()) {
                 Text(
-                    text = "Currencies ordered by strength (based on 1 EUR)",
+                    text = Strings.ORDERED_BY_STRENGTH,
                     style = MaterialTheme.typography.titleMedium
                 )
 
