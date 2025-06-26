@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import it.unibo.composeui.resources.Strings
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.MainViewModel
 import it.unibo.composeui.viewmodel.MainViewModelFactory
@@ -21,7 +22,9 @@ fun MainScreen(
     repositoryProvider: RepositoryProviderImpl
 ) {
     val navController = rememberNavController()
-    val viewModel: MainViewModel = viewModel(factory = MainViewModelFactory(repositoryProvider.networkChecker))
+    val viewModel: MainViewModel = viewModel(
+        factory = MainViewModelFactory(repositoryProvider.networkChecker)
+    )
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -49,8 +52,7 @@ fun MainScreen(
             }
             ConnectionStatusBanner(
                 viewModel = viewModel,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter)
             )
         }
     }
@@ -63,14 +65,14 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-            label = { Text("Home") },
+            icon = { Icon(Icons.Filled.Home, contentDescription = Strings.HOME_DESCRIPTION) },
+            label = { Text(Strings.HOME_LABEL) },
             selected = currentRoute == "home",
             onClick = { navController.navigate("home") }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Wallet, contentDescription = "Wallet") },
-            label = { Text("Wallet") },
+            icon = { Icon(Icons.Filled.Wallet, contentDescription = Strings.WALLET_DESCRIPTION) },
+            label = { Text(Strings.WALLET_LABEL) },
             selected = currentRoute == "wallet",
             onClick = { navController.navigate("wallet") }
         )
@@ -93,7 +95,7 @@ fun ConnectionStatusBanner(viewModel: MainViewModel, modifier: Modifier = Modifi
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    "No internet connection",
+                    text = Strings.NO_CONNECTION,
                     color = MaterialTheme.colorScheme.onError
                 )
             }
