@@ -2,6 +2,7 @@ package it.unibo.composeui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.theme.Background
+import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.theme.LightPrimaryBackground
 import it.unibo.composeui.viewmodel.WalletViewModel
@@ -276,8 +278,12 @@ fun AddWalletDialog(
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = LightPrimaryBackground,
-                        unfocusedContainerColor = LightPrimaryBackground
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
                     )
                 )
             }
@@ -299,7 +305,7 @@ fun AddWalletDialog(
                 Text("Cancel")
             }
         },
-        containerColor = Background
+        containerColor = if (isSystemInDarkTheme()) DarkBackground else Background
     )
 }
 
@@ -324,8 +330,12 @@ fun EditWalletDialog(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = LightPrimaryBackground,
-                    unfocusedContainerColor = LightPrimaryBackground
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
@@ -346,7 +356,7 @@ fun EditWalletDialog(
                 Text("Cancel")
             }
         },
-        containerColor = Background
+        containerColor = if (isSystemInDarkTheme()) DarkBackground else Background
     )
 }
 
@@ -369,7 +379,7 @@ fun ConfirmDeleteDialog(
                 Text("Cancel")
             }
         },
-        containerColor = Background
+        containerColor = if (isSystemInDarkTheme()) DarkBackground else Background
     )
 }
 
@@ -396,14 +406,20 @@ fun DropdownMenuCurrencySelector(
                 .menuAnchor()
                 .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = LightPrimaryBackground,
-                unfocusedContainerColor = LightPrimaryBackground
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface
             )
         )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(Color.White)
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
             currencies.forEach { currency ->
                 DropdownMenuItem(
