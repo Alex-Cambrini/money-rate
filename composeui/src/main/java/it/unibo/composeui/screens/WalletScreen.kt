@@ -16,7 +16,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
@@ -27,7 +26,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
-import it.unibo.composeui.theme.LightPrimaryBackground
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.composeui.viewmodel.WalletViewModelFactory
 import it.unibo.domain.model.WalletEntry
