@@ -9,6 +9,7 @@ import it.unibo.composeui.theme.MoneyRateTheme
 import it.unibo.composeui.screens.MainScreen
 import it.unibo.composeui.screens.SplashScreen
 import it.unibo.data.di.RepositoryProviderImpl
+import it.unibo.domain.di.UseCaseProvider
 
 class MainActivity : ComponentActivity() {
 
@@ -17,6 +18,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         repositoryProvider = RepositoryProviderImpl(this)
+        UseCaseProvider.setup(repositoryProvider)
+
 
         setContent {
             MoneyRateTheme {

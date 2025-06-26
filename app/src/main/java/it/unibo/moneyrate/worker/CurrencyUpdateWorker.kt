@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import it.unibo.data.di.RepositoryProviderImpl
-import it.unibo.domain.repository.CurrencyRepository
+import it.unibo.domain.repository.CurrencyRateRepository
 
 class CurrencyUpdateWorker(
     private val context: Context,
@@ -12,7 +12,8 @@ class CurrencyUpdateWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val repository: CurrencyRepository = RepositoryProviderImpl(context).currencyRepository
+        val repository: CurrencyRateRepository = RepositoryProviderImpl(context).currencyRateRepository
+
         return try {
             val success = repository.refreshCache()
             if (success) Result.success() else Result.retry()
