@@ -50,11 +50,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import it.unibo.composeui.resources.Strings
+import it.unibo.composeui.R
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
@@ -99,7 +100,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Icon(Icons.Default.Add, contentDescription = Strings.ADD_WALLET_DESCRIPTION)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_wallet_description))
             }
         }
     ) { padding ->
@@ -112,7 +113,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
         ) {
             item {
                 Text(
-                    text = Strings.TOTAL_VALUE_FORMAT.format(total),
+                    text = stringResource(R.string.total_value_format).format(total),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -165,12 +166,12 @@ fun WalletScreen(viewModel: WalletViewModel) {
             item {
                 if (entries.isEmpty()) {
                     Text(
-                        text = Strings.NO_WALLETS,
+                        text = stringResource(R.string.no_wallets),
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 } else {
                     Text(
-                        text = Strings.WALLETS,
+                        text = stringResource(R.string.wallets),
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
@@ -221,13 +222,13 @@ fun WalletScreen(viewModel: WalletViewModel) {
                                 IconButton(onClick = { editEntryId = item.id }) {
                                     Icon(
                                         Icons.Default.Edit,
-                                        contentDescription = Strings.EDIT_DESCRIPTION
+                                        contentDescription = stringResource(R.string.edit_description)
                                     )
                                 }
                                 IconButton(onClick = { deleteEntryId = item.id }) {
                                     Icon(
                                         Icons.Default.Delete,
-                                        contentDescription = Strings.DELETE_DESCRIPTION
+                                        contentDescription = stringResource(R.string.delete_description)
                                     )
                                 }
                             }
@@ -291,7 +292,7 @@ fun AddWalletDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(Strings.ADD_WALLET, color = textColor) },
+        title = { Text(stringResource(R.string.add_wallet), color = textColor) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)) {
                 DropdownMenuCurrencySelector(
@@ -307,7 +308,7 @@ fun AddWalletDialog(
                     onValueChange = {
                         if (it.all { ch -> ch.isDigit() || ch == '.' }) amountText = it
                     },
-                    label = { Text(Strings.AMOUNT, color = textColor) },
+                    label = { Text(stringResource(R.string.amount), color = textColor) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
@@ -328,12 +329,12 @@ fun AddWalletDialog(
                     onConfirm(selectedCurrency, amount)
                 }
             }) {
-                Text(Strings.CONFIRM, color = textColor)
+                Text(stringResource(R.string.confirm), color = textColor)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(Strings.CANCEL, color = textColor)
+                Text(stringResource(R.string.cancel), color = textColor)
             }
         },
         containerColor = backgroundColor
@@ -355,14 +356,14 @@ fun EditWalletDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(Strings.EDIT_AMOUNT, color = textColor) },
+        title = { Text(stringResource(R.string.edit_amount), color = textColor) },
         text = {
             TextField(
                 value = amountText,
                 onValueChange = {
                     if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it
                 },
-                label = { Text(Strings.DELTA, color = textColor) },
+                label = { Text(stringResource(R.string.delta), color = textColor) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -384,12 +385,12 @@ fun EditWalletDialog(
                     }
                 }
             ) {
-                Text(Strings.SAVE, color = textColor)
+                Text(stringResource(R.string.save), color = textColor)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(Strings.CANCEL, color = textColor)
+                Text(stringResource(R.string.cancel), color = textColor)
             }
         },
         containerColor = backgroundColor
@@ -408,16 +409,16 @@ fun ConfirmDeleteDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(Strings.DELETE_WALLET, color = textColor) },
-        text = { Text(Strings.CONFIRM_DELETE_WALLET, color = textColor) },
+        title = { Text(stringResource(R.string.delete_wallet), color = textColor) },
+        text = { Text(stringResource(R.string.confirm_delete_wallet), color = textColor) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(Strings.DELETE_DESCRIPTION, color = textColor)
+                Text(stringResource(R.string.delete_description), color = textColor)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(Strings.CANCEL, color = textColor)
+                Text(stringResource(R.string.cancel), color = textColor)
             }
         },
         containerColor = backgroundColor
@@ -446,7 +447,7 @@ fun DropdownMenuCurrencySelector(
             value = selected,
             onValueChange = {},
             readOnly = true,
-            label = { Text(Strings.CURRENCY, color = textColor) },
+            label = { Text(stringResource(R.string.currency), color = textColor) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()

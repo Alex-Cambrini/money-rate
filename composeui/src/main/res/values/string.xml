@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="total_value">Total Value</string>
+    <string name="no_wallets">No wallets available.</string>
+    <string name="wallets">Wallets</string>
+    <string name="add_wallet">Add Wallet</string>
+    <string name="edit_amount">Edit Amount</string>
+    <string name="delete_wallet">Delete Wallet</string>
+    <string name="confirm_delete_wallet">Are you sure you want to delete this wallet?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="currency">Currency</string>
+    <string name="amount">Amount</string>
+    <string name="delta">Delta (+/-)</string>
+    <string name="add_wallet_description">Add Wallet</string>
+    <string name="edit_description">Edit</string>
+    <string name="delete_description">Delete</string>
+    <string name="base_currency">Base Currency</string>
+    <string name="target_currency">Target Currency</string>
+    <string name="swap_currencies">Swap currencies</string>
+    <string name="convert">Convert</string>
+    <string name="currency_conversion_result">%1$s %2$s = %.4f %3$s</string>
+    <string name="ordered_by_strength">Currencies ordered by strength (based on 1 EUR)</string>
+    <string name="home_label">Home</string>
+    <string name="wallet_label">Wallet</string>
+    <string name="no_connection">No internet connection</string>
+    <string name="home_description">Home</string>
+    <string name="wallet_description">Wallet</string>
+    <string name="splash_title">MoneyRate</string>
+    <string name="total_value_format">Total Value: %.2f€</string>
+</resources>

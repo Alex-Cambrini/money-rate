@@ -13,8 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import it.unibo.composeui.resources.Strings
+import it.unibo.composeui.R
 import it.unibo.composeui.theme.Dimens
 import kotlinx.coroutines.delay
 
@@ -33,7 +34,8 @@ fun SplashScreen(onFinished: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = Strings.SPLASH_TITLE,
+                text = stringResource(
+                    R.string.splash_title),
                 fontSize = Dimens.splashTitleSize,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary

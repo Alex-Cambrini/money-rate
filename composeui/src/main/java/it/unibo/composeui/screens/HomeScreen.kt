@@ -42,9 +42,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import it.unibo.composeui.resources.Strings
+import it.unibo.composeui.R
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
@@ -99,7 +100,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
                 ) {
                     CurrencyDropdown(
-                        label = Strings.BASE_CURRENCY,
+                        label = stringResource(R.string.base_currency),
                         selectedCurrency = baseCurrency,
                         expanded = baseExpanded,
                         onExpandedChange = { expanded ->
@@ -115,7 +116,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     )
 
                     CurrencyDropdown(
-                        label = Strings.TARGET_CURRENCY,
+                        label = stringResource(R.string.target_currency),
                         selectedCurrency = targetCurrency,
                         expanded = targetExpanded,
                         onExpandedChange = { expanded ->
@@ -145,7 +146,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         .wrapContentSize()
                         .align(Alignment.CenterVertically)
                 ) {
-                    Icon(Icons.Filled.SwapVert, contentDescription = Strings.SWAP_CURRENCIES)
+                    Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.swap_currencies))
                 }
             }
 
@@ -167,7 +168,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
             if (top10Rates.isNotEmpty()) {
                 Text(
-                    text = Strings.ORDERED_BY_STRENGTH,
+                    text = stringResource(R.string.ordered_by_strength),
                     style = MaterialTheme.typography.titleMedium
                 )
                 CurrencyBarChart(top10Rates)
@@ -245,7 +246,7 @@ fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
     TextField(
         value = amount,
         onValueChange = onAmountChange,
-        label = { Text(Strings.AMOUNT, color = textColor) },
+        label = { Text(stringResource(R.string.amount), color = textColor) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
@@ -268,7 +269,7 @@ fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
         enabled = enabled,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(Strings.CONVERT)
+        Text(stringResource(R.string.convert))
     }
 }
 

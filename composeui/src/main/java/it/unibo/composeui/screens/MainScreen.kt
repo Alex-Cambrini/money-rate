@@ -21,13 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import it.unibo.composeui.resources.Strings
+import it.unibo.composeui.R
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
 import it.unibo.composeui.viewmodel.HomeViewModelFactory
@@ -100,14 +101,14 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Home, contentDescription = Strings.HOME_DESCRIPTION) },
-            label = { Text(Strings.HOME_LABEL) },
+            icon = { Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.home_description)) },
+            label = { Text(stringResource(R.string.home_label)) },
             selected = currentRoute == "home",
             onClick = { navController.navigate("home") }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Wallet, contentDescription = Strings.WALLET_DESCRIPTION) },
-            label = { Text(Strings.WALLET_LABEL) },
+            icon = { Icon(Icons.Filled.Wallet, contentDescription = stringResource(R.string.wallet_description)) },
+            label = { Text(stringResource(R.string.wallet_label)) },
             selected = currentRoute == "wallet",
             onClick = { navController.navigate("wallet") }
         )
@@ -130,7 +131,7 @@ fun ConnectionStatusBanner(viewModel: MainViewModel, modifier: Modifier = Modifi
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = Strings.NO_CONNECTION,
+                    text = stringResource(R.string.no_connection),
                     color = MaterialTheme.colorScheme.onError
                 )
             }
