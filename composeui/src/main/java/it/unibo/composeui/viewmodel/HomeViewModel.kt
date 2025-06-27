@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -16,10 +18,43 @@ class HomeViewModel(
 ) : ViewModel() {
     private val _rate = MutableStateFlow<Double?>(null)
     private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
-    private val _latestRates = MutableStateFlow<Map<String, Double>>(emptyMap())
-    val latestRates: StateFlow<Map<String, Double>> = _latestRates
-    val rate: StateFlow<Double?> = _rate
     val currencies: StateFlow<List<Pair<String, String>>> = _currencies
+
+    private val _latestRates = MutableStateFlow<Map<String, Double>>(emptyMap())
+
+    private val _amount = MutableStateFlow("")
+    val amount: StateFlow<String> = _amount
+
+    val result: StateFlow<Double?> = combine(_rate, _amount) { currentRate, currentAmount ->
+        val amountDouble = currentAmount.toDoubleOrNull()
+        if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    val top10Rates: StateFlow<Map<String, Double>> = _latestRates
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
+        .combine(_currencies) { rates, availableCurrencies ->
+            if (rates.isNotEmpty() && availableCurrencies.isNotEmpty()) {
+                rates.entries
+                    .sortedBy { it.value }
+                    .take(10)
+                    .associate { it.key to it.value }
+            } else {
+                emptyMap()
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
+
 
     fun loadRate(base: String = "EUR", to: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -30,8 +65,8 @@ class HomeViewModel(
 
     fun loadCurrencies() {
         viewModelScope.launch(Dispatchers.IO) {
-            val map = getAvailableCurrenciesUseCase.invoke()
-            _currencies.value = map.toList()
+            val list = getAvailableCurrenciesUseCase.invoke()
+            _currencies.value = list.map { it.code to it.name }
         }
     }
 
@@ -44,5 +79,9 @@ class HomeViewModel(
             }
             _latestRates.value = result
         }
+    }
+
+    fun updateAmount(newAmount: String) {
+        _amount.value = newAmount
     }
 }
