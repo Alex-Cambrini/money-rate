@@ -13,13 +13,8 @@ import it.unibo.domain.di.UseCaseProvider
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var repositoryProvider: RepositoryProviderImpl
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        repositoryProvider = RepositoryProviderImpl(this)
-        UseCaseProvider.setup(repositoryProvider)
-
 
         setContent {
             MoneyRateTheme {
@@ -30,7 +25,7 @@ class MainActivity : ComponentActivity() {
                         showSplash = false
                     }
                 } else {
-                    MainScreen(repositoryProvider)
+                    MainScreen()
                 }
             }
         }
