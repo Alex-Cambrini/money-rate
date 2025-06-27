@@ -26,7 +26,7 @@ object UseCaseProvider {
     lateinit var refreshCacheUseCase: RefreshCacheUseCase
     // wallet
     lateinit var addEntryUseCase: AddEntryUseCase
-    lateinit var getAllEntryUseCase: GetAllEntriesUseCase
+    lateinit var getAllEntriesUseCase: GetAllEntriesUseCase
     lateinit var removeEntryUseCase: RemoveEntryUseCase
     lateinit var updateEntryUseCase: UpdateEntryUseCase
 
@@ -46,7 +46,7 @@ object UseCaseProvider {
         addEntryUseCase = AddEntryUseCaseImpl(
             walletRepository = repositoryProvider.walletRepository
         )
-        getAllEntryUseCase = GetAllEntriesUseCaseImpl(
+        getAllEntriesUseCase = GetAllEntriesUseCaseImpl(
             walletRepository = repositoryProvider.walletRepository
         )
         removeEntryUseCase = RemoveEntryUseCaseImpl(
