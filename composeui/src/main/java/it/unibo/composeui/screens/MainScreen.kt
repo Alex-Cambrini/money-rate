@@ -13,18 +13,19 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import it.unibo.composeui.resources.Strings
 import it.unibo.composeui.theme.Dimens
+import it.unibo.composeui.viewmodel.HomeViewModel
+import it.unibo.composeui.viewmodel.HomeViewModelFactory
 import it.unibo.composeui.viewmodel.MainViewModel
 import it.unibo.composeui.viewmodel.MainViewModelFactory
-import it.unibo.data.di.RepositoryProviderImpl
+import it.unibo.composeui.viewmodel.WalletViewModel
+import it.unibo.composeui.viewmodel.WalletViewModelFactory
+import it.unibo.data.NetworkCheckerImpl
+import it.unibo.domain.di.UseCaseProvider
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun MainScreen(
-    repositoryProvider: RepositoryProviderImpl
-) {
+fun MainScreen() {
     val navController = rememberNavController()
-    val viewModel: MainViewModel = viewModel(
-        factory = MainViewModelFactory(repositoryProvider.networkChecker)
-    )
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -40,18 +41,37 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 composable("home") {
-                    HomeScreen(repositoryProvider.currencyRepository)
+                    val homeViewModel: HomeViewModel = viewModel(
+                        factory = HomeViewModelFactory(
+                            UseCaseProvider.getRateUseCase,
+                            UseCaseProvider.getAvailableCurrenciesUseCase
+                        )
+                    )
+                    HomeScreen(viewModel = homeViewModel)
                 }
                 composable("wallet") {
-                    WalletScreen(
-                        currencyRepository = repositoryProvider.currencyRepository,
-                        currencyRateRepository = repositoryProvider.currencyRateRepository,
-                        walletRepository = repositoryProvider.walletRepository
+                    val walletViewModel: WalletViewModel = viewModel(
+                        factory = WalletViewModelFactory(
+                            UseCaseProvider.addEntryUseCase,
+                            UseCaseProvider.updateEntryUseCase,
+                            UseCaseProvider.removeEntryUseCase,
+                            UseCaseProvider.getAllEntriesUseCase,
+                            UseCaseProvider.getAvailableCurrenciesUseCase,
+                            UseCaseProvider.refreshCacheUseCase,
+                            UseCaseProvider.getCachedRatesUseCase
+
+                        )
                     )
+                    WalletScreen(viewModel = walletViewModel)
                 }
             }
+            val mainViewModel: MainViewModel = viewModel(
+                factory = MainViewModelFactory(
+                    NetworkCheckerImpl(LocalContext.current)
+                )
+            )
             ConnectionStatusBanner(
-                viewModel = viewModel,
+                viewModel = mainViewModel,
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
