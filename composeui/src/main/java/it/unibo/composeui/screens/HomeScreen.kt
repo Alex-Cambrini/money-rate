@@ -25,6 +25,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -51,8 +52,6 @@ import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
     val amount by viewModel.amount.collectAsStateWithLifecycle(initialValue = "")
@@ -207,7 +206,10 @@ fun CurrencyDropdown(
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor(
+                type = MenuAnchorType.PrimaryNotEditable,
+                enabled = true
+            ),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = backgroundColor,
                 unfocusedContainerColor = backgroundColor,
@@ -238,7 +240,6 @@ fun CurrencyDropdown(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
     val isDark = isSystemInDarkTheme()
