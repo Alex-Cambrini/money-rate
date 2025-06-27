@@ -5,17 +5,17 @@ coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.0"
+lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2024.05.00"
-appcompat = "1.7.0"
+composeBom = "2025.06.01"
+appcompat = "1.7.1"
 material = "1.12.0"
-runtimeAndroid = "1.8.2"
+runtimeAndroid = "1.8.3"
 navigationCompose = "2.9.0"
-uiToolingPreviewAndroid = "1.8.2"
-kotlinxSerializationJson = "1.6.3"
+uiToolingPreviewAndroid = "1.8.3"
+kotlinxSerializationJson = "1.7.3"
 
-materialIconsExtended = "1.6.7"
+materialIconsExtended = "1.7.8"
 
 
 
@@ -23,10 +23,10 @@ retrofit = "2.11.0"
 moshi = "1.15.2"
 ksp = "2.1.20-2.0.0"
 
-roomKtx = "2.7.1"
-roomRuntime = "2.7.1"
+roomKtx = "2.7.2"
+roomRuntime = "2.7.2"
 workRuntimeKtx = "2.10.2"
-foundationAndroid = "1.6.7"
+foundationAndroid = "1.8.3"
 
 composeVersion = '1.8.3'
 
@@ -80,7 +80,6 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 
 
