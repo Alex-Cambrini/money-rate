@@ -146,7 +146,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         .wrapContentSize()
                         .align(Alignment.CenterVertically)
                 ) {
-                    Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.swap_currencies))
+                    Icon(
+                        Icons.Filled.SwapVert,
+                        contentDescription = stringResource(R.string.swap_currencies)
+                    )
                 }
             }
 

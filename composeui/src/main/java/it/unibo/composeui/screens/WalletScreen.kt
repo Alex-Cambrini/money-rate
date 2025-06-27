@@ -100,7 +100,10 @@ fun WalletScreen(viewModel: WalletViewModel) {
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_wallet_description))
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_wallet_description)
+                )
             }
         }
     ) { padding ->

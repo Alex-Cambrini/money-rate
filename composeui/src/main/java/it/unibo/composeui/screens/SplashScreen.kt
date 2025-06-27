@@ -35,7 +35,8 @@ fun SplashScreen(onFinished: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(
-                    R.string.splash_title),
+                    R.string.splash_title
+                ),
                 fontSize = Dimens.splashTitleSize,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary

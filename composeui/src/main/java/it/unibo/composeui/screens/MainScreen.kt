@@ -101,13 +101,23 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.home_description)) },
+            icon = {
+                Icon(
+                    Icons.Filled.Home,
+                    contentDescription = stringResource(R.string.home_description)
+                )
+            },
             label = { Text(stringResource(R.string.home_label)) },
             selected = currentRoute == "home",
             onClick = { navController.navigate("home") }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Wallet, contentDescription = stringResource(R.string.wallet_description)) },
+            icon = {
+                Icon(
+                    Icons.Filled.Wallet,
+                    contentDescription = stringResource(R.string.wallet_description)
+                )
+            },
             label = { Text(stringResource(R.string.wallet_label)) },
             selected = currentRoute == "wallet",
             onClick = { navController.navigate("wallet") }
