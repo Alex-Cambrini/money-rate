@@ -20,10 +20,12 @@ import it.unibo.domain.usecase.wallet.UpdateEntryUseCaseImpl
 object UseCaseProvider {
     // currency
     lateinit var getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase
+
     // currency rate
     lateinit var getCachedRatesUseCase: GetCachedRatesUseCase
     lateinit var getRateUseCase: GetRateUseCase
     lateinit var refreshCacheUseCase: RefreshCacheUseCase
+
     // wallet
     lateinit var addEntryUseCase: AddEntryUseCase
     lateinit var getAllEntriesUseCase: GetAllEntriesUseCase

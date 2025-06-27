@@ -3,15 +3,15 @@ package it.unibo.data.di
 import android.content.Context
 import it.unibo.data.NetworkCheckerImpl
 import it.unibo.data.local.db.AppDatabase
-import it.unibo.domain.di.RepositoryProvider
-import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.data.remote.RetrofitClient
 import it.unibo.data.repository.CurrencyRateRepositoryImpl
 import it.unibo.data.repository.CurrencyRepositoryImpl
-import it.unibo.domain.repository.WalletRepository
 import it.unibo.data.repository.WalletRepositoryImpl
 import it.unibo.domain.NetworkChecker
+import it.unibo.domain.di.RepositoryProvider
 import it.unibo.domain.repository.CurrencyRateRepository
+import it.unibo.domain.repository.CurrencyRepository
+import it.unibo.domain.repository.WalletRepository
 
 class RepositoryProviderImpl(private val context: Context) : RepositoryProvider {
 

@@ -9,7 +9,7 @@ interface GetAvailableCurrenciesUseCase {
 
 class GetAvailableCurrenciesUseCaseImpl(
     private val currencyRepository: CurrencyRepository
-): GetAvailableCurrenciesUseCase {
+) : GetAvailableCurrenciesUseCase {
     override suspend fun invoke(): List<Currency> {
         return currencyRepository.getAvailableCurrencies()
     }

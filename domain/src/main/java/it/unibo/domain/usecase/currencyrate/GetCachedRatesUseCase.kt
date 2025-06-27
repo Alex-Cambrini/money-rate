@@ -8,7 +8,7 @@ interface GetCachedRatesUseCase {
 
 class GetCachedRatesUseCaseImpl(
     private val currencyRateRepository: CurrencyRateRepository
-): GetCachedRatesUseCase {
+) : GetCachedRatesUseCase {
     override suspend fun invoke(): Map<String, Double> {
         return currencyRateRepository.getCachedRates()
     }

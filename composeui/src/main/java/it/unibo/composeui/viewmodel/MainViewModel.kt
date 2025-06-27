@@ -17,7 +17,7 @@ class MainViewModel(
     val isConnected: StateFlow<Boolean> = _isConnected
 
     init {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 _isConnected.value = networkChecker.isNetworkAvailable()
                 delay(5000)

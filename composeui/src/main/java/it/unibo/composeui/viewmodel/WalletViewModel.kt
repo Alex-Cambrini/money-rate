@@ -12,7 +12,11 @@ import it.unibo.domain.usecase.wallet.GetAllEntriesUseCase
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
 import it.unibo.domain.usecase.wallet.UpdateEntryUseCase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class WalletViewModel(
@@ -64,7 +68,8 @@ class WalletViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 refreshCacheUseCase.invoke()
-            } catch (_: Exception) { }
+            } catch (_: Exception) {
+            }
             val rates = getCachedRatesUseCase.invoke()
             _ratesCache.value = rates + ("EUR" to 1.0)
         }
@@ -94,7 +99,8 @@ class WalletViewModel(
     fun addWallet(currency: String, amount: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val name = _currencies.value.find { it.first == currency }?.second ?: currency
-            val newEntry = WalletEntry(id = 0, currencyCode = currency, currencyName = name, amount = amount)
+            val newEntry =
+                WalletEntry(id = 0, currencyCode = currency, currencyName = name, amount = amount)
             addEntryUseCase.invoke(newEntry)
         }
     }

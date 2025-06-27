@@ -7,9 +7,9 @@ interface GetRateUseCase {
     suspend fun invoke(from: String, to: String): CurrencyRate
 }
 
-class GetRateUseCaseImpl (
+class GetRateUseCaseImpl(
     private val currencyRateRepository: CurrencyRateRepository
-): GetRateUseCase {
+) : GetRateUseCase {
     override suspend fun invoke(from: String, to: String): CurrencyRate {
         val rate = currencyRateRepository.getRate(from, to) ?: 0.0
         return CurrencyRate(from, to, rate)

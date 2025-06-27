@@ -2,8 +2,8 @@ package it.unibo.composeui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import it.unibo.domain.usecase.currencyrate.GetRateUseCase
 import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
+import it.unibo.domain.usecase.currencyrate.GetRateUseCase
 
 class HomeViewModelFactory(
     private val getRateUseCase: GetRateUseCase,

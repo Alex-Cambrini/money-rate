@@ -3,7 +3,17 @@ package it.unibo.composeui.screens
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -12,8 +22,30 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -22,12 +54,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import it.unibo.composeui.resources.Strings
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.domain.model.WalletEntry
-import it.unibo.composeui.resources.Strings
 
 @Composable
 fun WalletScreen(viewModel: WalletViewModel) {
@@ -37,7 +69,9 @@ fun WalletScreen(viewModel: WalletViewModel) {
     val rates = combinedData.ratesCache
 
     val total by viewModel.total.collectAsState()
-    val currencies: List<Pair<String, String>> by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+    val currencies: List<Pair<String, String>> by viewModel.currencies.collectAsStateWithLifecycle(
+        emptyList()
+    )
 
     val colors = listOf(
         MaterialTheme.colorScheme.primary,
@@ -114,7 +148,10 @@ fun WalletScreen(viewModel: WalletViewModel) {
                                     Box(
                                         modifier = Modifier
                                             .size(Dimens.legendBoxSize)
-                                            .background(colors[index % colors.size], shape = CircleShape)
+                                            .background(
+                                                colors[index % colors.size],
+                                                shape = CircleShape
+                                            )
                                     )
                                     Spacer(modifier = Modifier.width(Dimens.elementSpacing))
                                     Text("${item.currencyCode}: %.2f".format(item.amount))
@@ -161,13 +198,19 @@ fun WalletScreen(viewModel: WalletViewModel) {
                             modifier = Modifier.weight(1f),
                             horizontalAlignment = Alignment.End
                         ) {
-                            Text("%.2f".format(item.amount), style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                "%.2f".format(item.amount),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                             val euroValue = if (rates.isNotEmpty()) {
                                 viewModel.convertToEuro(item, rates)
                             } else {
                                 0.0
                             }
-                            Text("%.2f€".format(euroValue), style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                "%.2f€".format(euroValue),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                         Column(
                             modifier = Modifier.weight(1f),
@@ -176,10 +219,16 @@ fun WalletScreen(viewModel: WalletViewModel) {
                         ) {
                             Row {
                                 IconButton(onClick = { editEntryId = item.id }) {
-                                    Icon(Icons.Default.Edit, contentDescription = Strings.EDIT_DESCRIPTION)
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = Strings.EDIT_DESCRIPTION
+                                    )
                                 }
                                 IconButton(onClick = { deleteEntryId = item.id }) {
-                                    Icon(Icons.Default.Delete, contentDescription = Strings.DELETE_DESCRIPTION)
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = Strings.DELETE_DESCRIPTION
+                                    )
                                 }
                             }
                         }
@@ -237,7 +286,8 @@ fun AddWalletDialog(
 
     val isDark = isSystemInDarkTheme()
     val backgroundColor = if (isDark) DarkBackground else Background
-    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+    val textColor =
+        if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -246,7 +296,8 @@ fun AddWalletDialog(
             Column(verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)) {
                 DropdownMenuCurrencySelector(
                     currencies = availableCurrencies.map { "${it.first} - ${it.second}" },
-                    selected = availableCurrencies.find { it.first == selectedCurrency }?.let { "${it.first} - ${it.second}" } ?: "",
+                    selected = availableCurrencies.find { it.first == selectedCurrency }
+                        ?.let { "${it.first} - ${it.second}" } ?: "",
                     onSelected = { selectedString ->
                         selectedCurrency = selectedString.substringBefore(" - ")
                     }
@@ -299,7 +350,8 @@ fun EditWalletDialog(
 
     val isDark = isSystemInDarkTheme()
     val backgroundColor = if (isDark) DarkBackground else Background
-    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+    val textColor =
+        if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -351,7 +403,8 @@ fun ConfirmDeleteDialog(
 ) {
     val isDark = isSystemInDarkTheme()
     val backgroundColor = if (isDark) DarkBackground else Background
-    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+    val textColor =
+        if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -382,7 +435,8 @@ fun DropdownMenuCurrencySelector(
 
     val isDark = isSystemInDarkTheme()
     val backgroundColor = if (isDark) DarkBackground else Background
-    val textColor = if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
+    val textColor =
+        if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
 
     ExposedDropdownMenuBox(
         expanded = expanded,

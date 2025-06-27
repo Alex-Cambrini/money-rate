@@ -7,7 +7,7 @@ import it.unibo.domain.repository.WalletRepository
 
 interface RepositoryProvider {
     val currencyRepository: CurrencyRepository
-    val currencyRateRepository : CurrencyRateRepository
+    val currencyRateRepository: CurrencyRateRepository
     val walletRepository: WalletRepository
     val networkChecker: NetworkChecker
 }
