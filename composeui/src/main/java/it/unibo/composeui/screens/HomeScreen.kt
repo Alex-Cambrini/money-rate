@@ -20,31 +20,24 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.resources.Strings
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
-import it.unibo.composeui.viewmodel.HomeViewModelFactory
-import it.unibo.domain.di.UseCaseProvider
-import it.unibo.domain.repository.CurrencyRepository
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(repository: CurrencyRepository) {
-    val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(
-        UseCaseProvider.getRateUseCase,
-        UseCaseProvider.getAvailableCurrenciesUseCase
-    ))
-    val rate by viewModel.rate.collectAsStateWithLifecycle(initialValue = null)
-    val latestRates by viewModel.latestRates.collectAsStateWithLifecycle(emptyMap())
+fun HomeScreen(viewModel: HomeViewModel) {
+    val amount by viewModel.amount.collectAsStateWithLifecycle(initialValue = "")
+    val result by viewModel.result.collectAsStateWithLifecycle(initialValue = null)
+    val top10Rates by viewModel.top10Rates.collectAsStateWithLifecycle(emptyMap())
+
     val scrollState = rememberScrollState()
 
     var baseCurrency by remember { mutableStateOf("EUR") }
     var targetCurrency by remember { mutableStateOf("USD") }
-    var amount by remember { mutableStateOf("") }
-    var result by remember { mutableStateOf<Double?>(null) }
 
     val availableCurrencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
     val focusManager = LocalFocusManager.current
@@ -54,12 +47,6 @@ fun HomeScreen(repository: CurrencyRepository) {
 
     LaunchedEffect(Unit) {
         viewModel.loadCurrencies()
-    }
-
-    LaunchedEffect(rate, amount) {
-        val currentRate = rate
-        val amountDouble = amount.toDoubleOrNull()
-        result = if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
     }
 
     LaunchedEffect(availableCurrencies) {
@@ -138,9 +125,14 @@ fun HomeScreen(repository: CurrencyRepository) {
                 }
             }
 
-            AmountInput(amount) { newValue ->
-                if (newValue.all { it.isDigit() || it == '.' }) amount = newValue
-            }
+            AmountInput(
+                amount = amount,
+                onAmountChange = { newValue ->
+                    if (newValue.all { it.isDigit() || it == '.' }) {
+                        viewModel.updateAmount(newValue)
+                    }
+                }
+            )
 
             ConvertButton(
                 enabled = amount.toDoubleOrNull() != null,
@@ -149,17 +141,11 @@ fun HomeScreen(repository: CurrencyRepository) {
 
             ResultDisplay(result, amount, baseCurrency, targetCurrency)
 
-            if (latestRates.isNotEmpty()) {
+            if (top10Rates.isNotEmpty()) {
                 Text(
                     text = Strings.ORDERED_BY_STRENGTH,
                     style = MaterialTheme.typography.titleMedium
                 )
-
-                val top10Rates = latestRates.entries
-                    .sortedBy { it.value }
-                    .take(10)
-                    .associate { it.key to it.value }
-
                 CurrencyBarChart(top10Rates)
             }
         }
