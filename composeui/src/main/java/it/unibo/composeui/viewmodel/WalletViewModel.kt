@@ -72,8 +72,8 @@ class WalletViewModel(
 
     fun loadCurrencies() {
         viewModelScope.launch(Dispatchers.IO) {
-            val map = getAvailableCurrenciesUseCase.invoke()
-            _currencies.value = map.toList()
+            val list = getAvailableCurrenciesUseCase.invoke()
+            _currencies.value = list.map { it.code to it.name }
         }
     }
 
