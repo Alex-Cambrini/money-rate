@@ -22,42 +22,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.WalletViewModel
-import it.unibo.composeui.viewmodel.WalletViewModelFactory
 import it.unibo.domain.model.WalletEntry
-import it.unibo.domain.repository.CurrencyRateRepository
-import it.unibo.domain.repository.CurrencyRepository
-import it.unibo.domain.repository.WalletRepository
-import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCaseImpl
-import it.unibo.domain.usecase.currencyrate.GetCachedRatesUseCaseImpl
-import it.unibo.domain.usecase.currencyrate.RefreshCacheUseCaseImpl
-import it.unibo.domain.usecase.wallet.AddEntryUseCaseImpl
-import it.unibo.domain.usecase.wallet.GetAllEntriesUseCaseImpl
-import it.unibo.domain.usecase.wallet.RemoveEntryUseCaseImpl
-import it.unibo.domain.usecase.wallet.UpdateEntryUseCaseImpl
 import it.unibo.composeui.resources.Strings
 
 @Composable
-fun WalletScreen(
-    currencyRepository: CurrencyRepository,
-    currencyRateRepository: CurrencyRateRepository,
-    walletRepository: WalletRepository
-) {
-    val viewModel: WalletViewModel = viewModel(
-        factory = WalletViewModelFactory(
-            addEntryUseCase = AddEntryUseCaseImpl(walletRepository),
-            updateEntryUseCase = UpdateEntryUseCaseImpl(walletRepository),
-            removeEntryUseCase = RemoveEntryUseCaseImpl(walletRepository),
-            getAllEntriesUseCase = GetAllEntriesUseCaseImpl(walletRepository),
-            getAvailableCurrenciesUseCase = GetAvailableCurrenciesUseCaseImpl(currencyRepository),
-            refreshCacheUseCase = RefreshCacheUseCaseImpl(currencyRateRepository),
-            getCachedRatesUseCase = GetCachedRatesUseCaseImpl(currencyRateRepository)
-        )
-    )
+fun WalletScreen(viewModel: WalletViewModel) {
 
     val combinedData by viewModel.combinedData.collectAsStateWithLifecycle()
     val entries = combinedData.entries
