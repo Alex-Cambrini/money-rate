@@ -4,13 +4,12 @@ import it.unibo.data.local.dao.CurrencyRateDao
 import it.unibo.data.local.entity.CurrencyRateEntity
 import it.unibo.data.remote.CurrencyRateApi
 import it.unibo.data.remote.models.ExchangeRatesResponse
+import it.unibo.domain.model.CurrencyRate
 import it.unibo.domain.repository.CurrencyRateRepository
-
 
 class CurrencyRateRepositoryImpl(
     private val dao: CurrencyRateDao,
     private val api: CurrencyRateApi
-
 ) : CurrencyRateRepository {
 
     companion object {
@@ -23,7 +22,9 @@ class CurrencyRateRepositoryImpl(
 
         if (from == CACHE_BASE || to == CACHE_BASE) {
             if (!refreshCache()) return null
-            val rates = dao.getRatesByBase(CACHE_BASE).associate { it.currencyCode to it.rate }
+            val rates = dao.getRatesByBase(CACHE_BASE)
+                .map { it.toCurrencyRate() }
+                .associate { it.to to it.rate }
 
             return when {
                 from == CACHE_BASE -> rates[to]
@@ -41,7 +42,8 @@ class CurrencyRateRepositoryImpl(
 
     override suspend fun getCachedRates(): Map<String, Double> {
         val rates = dao.getRatesByBase(CACHE_BASE)
-        return rates.associate { it.currencyCode to it.rate }
+            .map { it.toCurrencyRate() }
+        return rates.associate { it.to to it.rate }
     }
 
     override suspend fun refreshCache(): Boolean {
@@ -70,6 +72,14 @@ class CurrencyRateRepositoryImpl(
             rate = rate,
             base = base,
             timestamp = System.currentTimeMillis()
+        )
+    }
+
+    private fun CurrencyRateEntity.toCurrencyRate(): CurrencyRate {
+        return CurrencyRate(
+            from = base,
+            to = currencyCode,
+            rate = rate
         )
     }
 }
