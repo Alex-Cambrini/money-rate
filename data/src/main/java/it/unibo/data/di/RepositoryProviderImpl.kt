@@ -13,7 +13,7 @@ import it.unibo.domain.repository.CurrencyRateRepository
 import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.domain.repository.WalletRepository
 
-class RepositoryProviderImpl(private val context: Context) : RepositoryProvider {
+class RepositoryProviderImpl(context: Context) : RepositoryProvider {
 
     private val retrofitClient = RetrofitClient()
     private val database = AppDatabase.getInstance(context)
