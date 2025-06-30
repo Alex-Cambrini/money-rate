@@ -26,10 +26,10 @@ class CurrencyRateRepositoryImpl(
                 .map { it.toCurrencyRate() }
                 .associate { it.to to it.rate }
 
-            return when {
-                from == CACHE_BASE -> rates[to]
-                to == CACHE_BASE -> rates[from]?.let { 1.0 / it }
-                else -> null
+            return if (from == CACHE_BASE) {
+                rates[to]
+            } else {
+                rates[from]?.let { 1.0 / it }
             }
         }
         val response = try {
