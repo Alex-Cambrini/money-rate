@@ -16,7 +16,7 @@ class CurrencyUpdateWorker(
         Log.d(
             "CurrencyUpdateWorker",
             "Worker started - attempting refresh of currency cache."
-        ) // Log iniziale più specifico
+        ) //log for worker start
         val repository: CurrencyRateRepository =
             RepositoryProviderImpl(context).currencyRateRepository
 
@@ -26,13 +26,13 @@ class CurrencyUpdateWorker(
                 Log.d(
                     "CurrencyUpdateWorker",
                     "Refresh cache SUCCESS! Worker completed."
-                ) // Log in caso di successo
+                ) // Log if refreshCache() returns true
                 Result.success()
             } else {
                 Log.e(
                     "CurrencyUpdateWorker",
                     "Refresh cache FAILED: repository.refreshCache() returned false. Retrying."
-                ) // Log se refreshCache() restituisce false
+                ) // Log if refreshCache() returns false
                 Result.retry()
             }
         } catch (e: Exception) {
@@ -40,7 +40,7 @@ class CurrencyUpdateWorker(
                 "CurrencyUpdateWorker",
                 "Refresh cache EXCEPTION: An error occurred during refresh. Retrying.",
                 e
-            ) // Log in caso di eccezione, con stack trace
+            ) // Log if an exception occurs
             Result.retry()
         }
     }
