@@ -27,9 +27,6 @@ class CustomApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         UseCaseProvider.setup(repositoryProvider)
-
-        // NO WorkManager.initialize() qui: viene gestito automaticamente
-
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "CurrencyUpdate",
             ExistingPeriodicWorkPolicy.KEEP,
