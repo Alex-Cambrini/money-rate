@@ -1,7 +1,7 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.kotlinCompose)
+    alias(libs.plugins.androidLibrary)
 }
 
 android {
@@ -36,24 +36,34 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.runtime.android)
-    implementation(libs.androidx.ui.tooling.preview.android)
+    // Core & platform
+    implementation(libs.androidxCoreKtx)
+    implementation(libs.androidxAppcompat)
+    implementation(libs.androidxRuntimeAndroid)
+    implementation(libs.androidxFoundationAndroid)
+
+    // Project modules
     implementation(project(":domain"))
     implementation(project(":data"))
-    implementation(libs.androidx.foundation.android)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+
     // Compose
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.ui)
-    implementation(libs.androidx.material3)
-    implementation(libs.ui.tooling.preview)
-    debugImplementation(libs.ui.tooling)
-    debugImplementation(libs.ui.test.manifest)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.material.icons.extended)
+    implementation(platform(libs.androidxComposeBom))
+    implementation(libs.androidxComposeUi)
+    implementation(libs.androidxComposeMaterial3)
+    implementation(libs.androidxComposeMaterialIconsExtended)
+    implementation(libs.androidxComposeUiToolingPreview)
+    implementation(libs.androidxComposeUiToolingPreviewAndroid)
+    debugImplementation(libs.androidxComposeUiTooling)
+    debugImplementation(libs.androidxComposeUiTestManifest)
+
+    // Navigation
+    implementation(libs.androidxNavigationCompose)
+
+    // Serialization
+    implementation(libs.kotlinxSerializationJson)
+
+    // Tests
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidxTestJunit)
+    androidTestImplementation(libs.androidxTestEspressoCore)
 }
