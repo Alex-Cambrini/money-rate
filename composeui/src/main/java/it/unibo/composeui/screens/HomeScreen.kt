@@ -54,57 +54,46 @@ import it.unibo.composeui.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
-    val amount by viewModel.amount.collectAsStateWithLifecycle(initialValue = "")
-    val result by viewModel.result.collectAsStateWithLifecycle(initialValue = null)
+    val amount by viewModel.amount.collectAsStateWithLifecycle("")
+    val result by viewModel.result.collectAsStateWithLifecycle(null)
     val top10Rates by viewModel.top10Rates.collectAsStateWithLifecycle(emptyMap())
-
-    val scrollState = rememberScrollState()
+    val availableCurrencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
 
     var baseCurrency by remember { mutableStateOf("EUR") }
     var targetCurrency by remember { mutableStateOf("USD") }
-
-    val availableCurrencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
-    val focusManager = LocalFocusManager.current
-
     var baseExpanded by remember { mutableStateOf(false) }
     var targetExpanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadCurrencies()
-    }
+    val focusManager = LocalFocusManager.current
+    val scrollState = rememberScrollState()
 
+    LaunchedEffect(Unit) { viewModel.loadCurrencies() }
     LaunchedEffect(availableCurrencies) {
-        if (availableCurrencies.isNotEmpty()) {
-            viewModel.loadAllRatesAgainstEuro(
-                availableCurrencies.map { it.first }.filter { it != "EUR" }
-            )
-        }
+        if (availableCurrencies.isNotEmpty())
+            viewModel.loadAllRatesAgainstEuro(availableCurrencies.map { it.first }.filter { it != "EUR" })
     }
 
-    Scaffold { innerPadding ->
+    Scaffold { padding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(padding)
                 .padding(Dimens.screenPadding)
                 .fillMaxSize()
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
-                ) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)) {
                     CurrencyDropdown(
                         label = stringResource(R.string.base_currency),
                         selectedCurrency = baseCurrency,
                         expanded = baseExpanded,
-                        onExpandedChange = { expanded ->
-                            baseExpanded = expanded
-                            if (expanded) focusManager.clearFocus(true)
+                        onExpandedChange = {
+                            baseExpanded = it
+                            if (it) focusManager.clearFocus(true)
                         },
                         onCurrencySelected = {
                             baseCurrency = it
@@ -113,14 +102,13 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         currencies = availableCurrencies,
                         modifier = Modifier.fillMaxWidth()
                     )
-
                     CurrencyDropdown(
                         label = stringResource(R.string.target_currency),
                         selectedCurrency = targetCurrency,
                         expanded = targetExpanded,
-                        onExpandedChange = { expanded ->
-                            targetExpanded = expanded
-                            if (expanded) focusManager.clearFocus(true)
+                        onExpandedChange = {
+                            targetExpanded = it
+                            if (it) focusManager.clearFocus(true)
                         },
                         onCurrencySelected = {
                             targetCurrency = it
@@ -130,54 +118,34 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-
-                Spacer(modifier = Modifier.width(Dimens.elementSpacing))
-
+                Spacer(Modifier.width(Dimens.elementSpacing))
                 Button(
                     onClick = {
-                        val oldBase = baseCurrency
-                        val oldTarget = targetCurrency
-                        baseCurrency = oldTarget
-                        targetCurrency = oldBase
-                        viewModel.loadRate(oldTarget, oldBase)
+                        baseCurrency = targetCurrency.also { targetCurrency = baseCurrency }
+                        viewModel.loadRate(baseCurrency, targetCurrency)
                     },
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .align(Alignment.CenterVertically)
+                    modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically)
                 ) {
-                    Icon(
-                        Icons.Filled.SwapVert,
-                        contentDescription = stringResource(R.string.swap_currencies)
-                    )
+                    Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.swap_currencies))
                 }
             }
 
-            AmountInput(
-                amount = amount,
-                onAmountChange = { newValue ->
-                    if (newValue.all { it.isDigit() || it == '.' }) {
-                        viewModel.updateAmount(newValue)
-                    }
-                }
-            )
+            AmountInput(amount, onAmountChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) viewModel.updateAmount(it) })
 
-            ConvertButton(
-                enabled = amount.toDoubleOrNull() != null,
-                onClick = { viewModel.loadRate(baseCurrency, targetCurrency) }
-            )
+            ConvertButton(enabled = amount.toDoubleOrNull() != null) {
+                viewModel.loadRate(baseCurrency, targetCurrency)
+            }
 
             ResultDisplay(result, amount, baseCurrency, targetCurrency)
 
             if (top10Rates.isNotEmpty()) {
-                Text(
-                    text = stringResource(R.string.ordered_by_strength),
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Text(stringResource(R.string.ordered_by_strength), style = MaterialTheme.typography.titleMedium)
                 CurrencyBarChart(top10Rates)
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
