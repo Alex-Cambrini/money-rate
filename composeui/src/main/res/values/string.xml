@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="total_value">Total Value</string>
     <string name="no_wallets">No wallets available.</string>
     <string name="wallets">Wallets</string>
     <string name="add_wallet">Add Wallet</string>
@@ -20,7 +19,6 @@
     <string name="target_currency">Target Currency</string>
     <string name="swap_currencies">Swap currencies</string>
     <string name="convert">Convert</string>
-    <string name="currency_conversion_result">%1$s %2$s = %.4f %3$.4f</string>
     <string name="ordered_by_strength">Currencies ordered by strength (based on 1 EUR)</string>
     <string name="home_label">Home</string>
     <string name="wallet_label">Wallet</string>
