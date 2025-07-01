@@ -15,7 +15,6 @@ import it.unibo.domain.repository.WalletRepository
 
 class RepositoryProviderImpl(context: Context) : RepositoryProvider {
 
-    private val retrofitClient = RetrofitClient()
     private val database = AppDatabase.getInstance(context)
     private val currencyRateDao = database.currencyRateDao()
     private val currencyDao = database.currencyDao()
@@ -23,11 +22,11 @@ class RepositoryProviderImpl(context: Context) : RepositoryProvider {
 
     override var currencyRepository: CurrencyRepository = CurrencyRepositoryImpl(
         dao = currencyDao,
-        api = retrofitClient.currencyApi
+        api = RetrofitClient.currencyApi
     )
     override val currencyRateRepository: CurrencyRateRepository = CurrencyRateRepositoryImpl(
         dao = currencyRateDao,
-        api = retrofitClient.currencyRateApi
+        api = RetrofitClient.currencyRateApi
     )
 
     override var walletRepository: WalletRepository = WalletRepositoryImpl(
@@ -35,4 +34,3 @@ class RepositoryProviderImpl(context: Context) : RepositoryProvider {
     )
     override val networkChecker: NetworkChecker = NetworkCheckerImpl(context)
 }
-
