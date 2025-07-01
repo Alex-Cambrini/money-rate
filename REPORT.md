@@ -13,7 +13,6 @@ Le principali funzionalità implementate nell’app sono:
 - Conversione valutaria in tempo reale, basata su tassi aggiornati online (via API Frankfurter.app)
 - Gestione di un wallet virtuale, con valute e importi personalizzabili
 - Grafici visuali interattivi: Donut chart per rappresentare la composizione del portafoglio, Bar chart per confrontare i tassi di cambio
-- Aggiornamento automatico dei tassi ogni 15 minuti, tramite WorkManager
 - Tema scuro e tema chiaro adattivo
 
 ## 3. Architettura e struttura del progetto
@@ -28,7 +27,7 @@ La struttura modulare è suddivisa in tre moduli principali:
 
 - `domain/`: modelli, repository astratti, casi d’uso
 - `data/`: implementazioni repository, chiamate API, database Room
-- `composeui/`: schermate, ViewModel, temi, navigation, MainActivity
+- `composeui/`: schermate, ViewModel, temi, navigation
 
 **Struttura ad alto livello:**  
 money-rate/
@@ -69,27 +68,24 @@ La comunicazione avviene tramite Retrofit con parser JSON Moshi.
 
 ## 7. UI e UX
 L’interfaccia è realizzata interamente in Jetpack Compose, con tre schermate principali:
-- SplashScreen: schermata iniziale con animazione e caricamento
-- HomeScreen: conversione valuta, grafico bar chart
-- WalletScreen: gestione del wallet, donut chart, entry modificabili
+- SplashScreen: schermata iniziale con animazione e caricamento dei dati
+- HomeScreen: conversione valuta e visualizzazione grafica dei tassi di cambio
+- WalletScreen: gestione del portafoglio con rappresentazione visiva della composizione
 
-La UI supporta nativamente tema scuro/chiaro, grazie all’uso dinamico dei colori Material.
+L’interfaccia supporta automaticamente il tema scuro e chiaro, adattandosi alle preferenze del sistema operativo per un’esperienza visiva coerente e confortevole.
 
 ## 8. Gestione aggiornamenti: WorkManager
-Al lancio dell’app, la classe CustomApplication registra un worker ricorrente ogni 15 minuti (`CurrencyUpdateWorker`) che:
-- recupera i tassi di cambio aggiornati
-- aggiorna la cache locale nel database Room
-- gestisce eventuali errori o retry
-
-Questo garantisce la presenza di dati aggiornati anche offline.
+- All’avvio, l’app attiva un processo che aggiorna i tassi di cambio ogni 15 minuti.
+- Questi dati vengono salvati localmente per permettere l’uso dell’app anche senza connessione.
+- Il sistema gestisce automaticamente eventuali errori, riprovando a scaricare i dati quando necessario.
 
 ## 9. Punti di forza
 - Architettura pulita, facilmente estendibile
 - UI moderna e reattiva
 - Grafici interattivi ben integrati
-- Aggiornamento automatico dei dati
+- Aggiornamento automatico dati via WorkManager
 - Codice modulare e leggibile
-- Nessun blocco sulla main thread (uso corretto di coroutine)
+- Uso corretto di coroutine per operazioni asincrone, evitando blocchi sulla main thread
 
 ## 10. Possibili estensioni future
 Sebbene il progetto sia stato completato con tutte le funzionalità previste, alcune estensioni utili potrebbero essere:
