@@ -15,8 +15,6 @@ Le principali funzionalità implementate nell’app sono:
 - Grafici visuali interattivi: Donut chart per rappresentare la composizione del portafoglio, Bar chart per confrontare i tassi di cambio
 - Aggiornamento automatico dei tassi ogni 15 minuti, tramite WorkManager
 - Tema scuro e tema chiaro adattivo
-- UI completamente in Jetpack Compose
-- Splash screen animata all’avvio dell’app
 
 ## 3. Architettura e struttura del progetto
 Il progetto applica i principi della Clean Architecture, separando chiaramente:
