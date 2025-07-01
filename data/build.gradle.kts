@@ -1,8 +1,7 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
-
 }
 
 android {
@@ -33,21 +32,28 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.room.runtime)
+    // Project
     implementation(project(":domain"))
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.room.ktx)
 
+    // Room (con KSP)
+    implementation(libs.roomRuntime)
+    implementation(libs.roomKtx)
+    ksp(libs.roomCompiler)
+
+    // Retrofit + Moshi (con KSP)
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofitConverterMoshi)
     implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    ksp(libs.moshi.codegen)
+    implementation(libs.moshiKotlin)
+    ksp(libs.moshiCodegen)
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
+    // Android core libs
+    implementation(libs.androidxCoreKtx)
+    implementation(libs.androidxAppcompat)
     implementation(libs.material)
+
+    // Tests
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidxTestJunit)
+    androidTestImplementation(libs.androidxTestEspressoCore)
 }
