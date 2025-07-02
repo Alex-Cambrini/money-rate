@@ -23,6 +23,10 @@ class HomeViewModel(
     private val _latestRates = MutableStateFlow<Map<String, Double>>(emptyMap())
 
     private val _amount = MutableStateFlow("")
+    private val _isDataReady = MutableStateFlow(false)
+    private val _isError = MutableStateFlow(false)
+    val isError: StateFlow<Boolean> = _isError
+    val isDataReady: StateFlow<Boolean> = _isDataReady
     val amount: StateFlow<String> = _amount
 
     val result: StateFlow<Double?> = combine(_rate, _amount) { currentRate, currentAmount ->
@@ -83,5 +87,36 @@ class HomeViewModel(
 
     fun updateAmount(newAmount: String) {
         _amount.value = newAmount
+    }
+
+    fun initializeIfNeeded() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                if (_currencies.value.isNotEmpty() && _latestRates.value.isNotEmpty()) {
+                    _isDataReady.value = true
+                    return@launch
+                }
+
+                val list = getAvailableCurrenciesUseCase.invoke()
+                _currencies.value = list.map { it.code to it.name }
+
+                if (_currencies.value.isNotEmpty()) {
+                    val result = mutableMapOf<String, Double>()
+                    for ((code, _) in _currencies.value) {
+                        if (code != "EUR") {
+                            val rate = getRateUseCase.invoke("EUR", code).rate
+                            if (rate != 0.0) result[code] = rate
+                        }
+                    }
+                    _latestRates.value = result
+                }
+
+                _isDataReady.value = true
+                _isError.value = false
+            } catch (e: Exception) {
+                _isError.value = true
+                _isDataReady.value = false
+            }
+        }
     }
 }
