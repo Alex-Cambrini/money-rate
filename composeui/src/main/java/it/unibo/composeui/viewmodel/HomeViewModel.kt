@@ -94,21 +94,26 @@ class HomeViewModel(
             try {
                 if (_currencies.value.isNotEmpty() && _latestRates.value.isNotEmpty()) {
                     _isDataReady.value = true
+                    _isError.value = false
                     return@launch
                 }
-
                 val list = getAvailableCurrenciesUseCase.invoke()
                 _currencies.value = list.map { it.code to it.name }
 
-                if (_currencies.value.isNotEmpty()) {
-                    val result = mutableMapOf<String, Double>()
-                    for ((code, _) in _currencies.value) {
-                        if (code != "EUR") {
-                            val rate = getRateUseCase.invoke("EUR", code).rate
-                            if (rate != 0.0) result[code] = rate
-                        }
+
+                val result = mutableMapOf<String, Double>()
+                for ((code, _) in _currencies.value) {
+                    if (code != "EUR") {
+                        val rate = getRateUseCase.invoke("EUR", code).rate
+                        if (rate != 0.0) result[code] = rate
                     }
-                    _latestRates.value = result
+                }
+                _latestRates.value = result
+
+                if (_latestRates.value.isEmpty()) {
+                    _isError.value = true
+                    _isDataReady.value = false
+                    return@launch
                 }
 
                 _isDataReady.value = true
@@ -119,4 +124,5 @@ class HomeViewModel(
             }
         }
     }
+
 }
