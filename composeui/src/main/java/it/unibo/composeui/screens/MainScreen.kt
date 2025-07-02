@@ -59,12 +59,12 @@ fun MainScreen(homeViewModel: HomeViewModel, mainViewModel: MainViewModel) {
                     val walletViewModel: WalletViewModel = viewModel(
                         factory = WalletViewModelFactory(
                             UseCaseProvider.addEntryUseCase,
-                            UseCaseProvider.updateEntryUseCase,
                             UseCaseProvider.removeEntryUseCase,
                             UseCaseProvider.getAllEntriesUseCase,
                             UseCaseProvider.getAvailableCurrenciesUseCase,
                             UseCaseProvider.refreshCacheUseCase,
-                            UseCaseProvider.getCachedRatesUseCase
+                            UseCaseProvider.getCachedRatesUseCase,
+                            UseCaseProvider.updateWalletAmountUseCase
                         )
                     )
                     WalletScreen(viewModel = walletViewModel)

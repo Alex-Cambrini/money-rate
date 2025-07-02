@@ -256,16 +256,29 @@ fun WalletScreen(viewModel: WalletViewModel) {
         )
     }
 
+    var triedSave by remember { mutableStateOf(false) }
+    val errorMessage by viewModel.errorMessage.collectAsState()
     val entryToEdit = entries.find { it.id == editEntryId }
+
     if (entryToEdit != null) {
         EditWalletDialog(
-            initialAmount = entryToEdit.amount,
-            onDismiss = { editEntryId = null },
+            errorMessage = errorMessage,
+            onDismiss = {
+                viewModel.clearError()
+                triedSave = false
+                editEntryId = null
+            },
             onConfirm = { delta ->
                 viewModel.modifyWallet(entryToEdit, delta)
-                editEntryId = null
+                triedSave = true
             }
         )
+    }
+
+    if (triedSave && errorMessage == null) {
+        viewModel.clearError()
+        triedSave = false
+        editEntryId = null
     }
 
     val entryToDelete = entries.find { it.id == deleteEntryId }
@@ -347,11 +360,11 @@ fun AddWalletDialog(
 
 @Composable
 fun EditWalletDialog(
-    initialAmount: Double,
+    errorMessage: String?,
     onDismiss: () -> Unit,
     onConfirm: (Double) -> Unit
 ) {
-    var amountText by remember { mutableStateOf(initialAmount.toString()) }
+    var amountText by remember { mutableStateOf("") }
 
     val isDark = isSystemInDarkTheme()
     val backgroundColor = if (isDark) DarkBackground else Background
@@ -362,33 +375,40 @@ fun EditWalletDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.edit_amount), color = textColor) },
         text = {
-            TextField(
-                value = amountText,
-                onValueChange = {
-                    if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it
-                },
-                label = { Text(stringResource(R.string.delta), color = textColor) },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = backgroundColor,
-                    unfocusedContainerColor = backgroundColor,
-                    focusedTextColor = textColor,
-                    unfocusedTextColor = textColor,
-                    focusedLabelColor = textColor,
-                    unfocusedLabelColor = textColor
+            Column {
+                TextField(
+                    value = amountText,
+                    onValueChange = {
+                        if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it
+                    },
+                    label = { Text(stringResource(R.string.delta), color = textColor) },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = backgroundColor,
+                        unfocusedContainerColor = backgroundColor,
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        focusedLabelColor = textColor,
+                        unfocusedLabelColor = textColor
+                    )
                 )
-            )
+                if (errorMessage != null) {
+                    Spacer(modifier = Modifier.height(Dimens.elementSpacing))
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    val delta = amountText.toDoubleOrNull()
-                    if (delta != null) {
-                        onConfirm(delta)
-                    }
+            TextButton(onClick = {
+                val delta = amountText.toDoubleOrNull()
+                if (delta != null) {
+                    onConfirm(delta)
                 }
-            ) {
+            }) {
                 Text(stringResource(R.string.save), color = textColor)
             }
         },

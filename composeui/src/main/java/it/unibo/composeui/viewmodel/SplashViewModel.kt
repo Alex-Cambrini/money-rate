@@ -12,13 +12,13 @@ class SplashViewModel(
 ) : ViewModel() {
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class Success(
             val currencies: List<Pair<String, String>>,
             val rates: Map<String, Double>
         ) : State()
 
-        object Error : State()
+        data object Error : State()
     }
 
     private val _state = MutableStateFlow<State>(State.Loading)

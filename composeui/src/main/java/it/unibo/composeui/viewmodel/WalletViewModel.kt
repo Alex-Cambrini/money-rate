@@ -10,7 +10,7 @@ import it.unibo.domain.usecase.currencyrate.RefreshCacheUseCase
 import it.unibo.domain.usecase.wallet.AddEntryUseCase
 import it.unibo.domain.usecase.wallet.GetAllEntriesUseCase
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
-import it.unibo.domain.usecase.wallet.UpdateEntryUseCase
+import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,12 +21,12 @@ import kotlinx.coroutines.launch
 
 class WalletViewModel(
     private val addEntryUseCase: AddEntryUseCase,
-    private val updateEntryUseCase: UpdateEntryUseCase,
     private val removeEntryUseCase: RemoveEntryUseCase,
     private val getAllEntriesUseCase: GetAllEntriesUseCase,
     private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase,
     private val refreshCacheUseCase: RefreshCacheUseCase,
-    private val getCachedRatesUseCase: GetCachedRatesUseCase
+    private val getCachedRatesUseCase: GetCachedRatesUseCase,
+    private val updateWalletAmountUseCase: UpdateWalletAmountUseCase,
 ) : ViewModel() {
 
     private val _entries = getAllEntriesUseCase
@@ -48,6 +48,9 @@ class WalletViewModel(
 
     private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val currencies: StateFlow<List<Pair<String, String>>> = _currencies
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
 
     init {
         viewModelScope.launch {
@@ -107,8 +110,13 @@ class WalletViewModel(
 
     fun modifyWallet(entry: WalletEntry, delta: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-            val updated = entry.copy(amount = entry.amount + delta)
-            updateEntryUseCase.invoke(updated)
+            _errorMessage.value = null
+            try {
+                updateWalletAmountUseCase.invoke(entry, delta)
+                _errorMessage.value = null
+            } catch (e: IllegalArgumentException) {
+                _errorMessage.value = e.message
+            }
         }
     }
 
@@ -116,5 +124,9 @@ class WalletViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             removeEntryUseCase.invoke(entry)
         }
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
     }
 }
