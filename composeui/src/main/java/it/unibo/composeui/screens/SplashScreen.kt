@@ -20,12 +20,7 @@ import it.unibo.composeui.theme.Dimens
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(onFinished: () -> Unit) {
-    LaunchedEffect(Unit) {
-        delay(2000)
-        onFinished()
-    }
-
+fun SplashScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +36,6 @@ fun SplashScreen(onFinished: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary
             )
-
             Spacer(modifier = Modifier.height(Dimens.splashSpacerHeight))
 
             CircularProgressIndicator(
@@ -50,3 +44,32 @@ fun SplashScreen(onFinished: () -> Unit) {
         }
     }
 }
+
+@Composable
+fun SplashScreenWithError(onRetry: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(R.string.splash_title),
+                fontSize = Dimens.splashTitleSize,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(Modifier.height(Dimens.splashSpacerHeight))
+            Text(
+                text = stringResource(R.string.loading_failed),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(Modifier.height(Dimens.splashSpacerHeight))
+            androidx.compose.material3.Button(onClick = onRetry) {
+                Text(text = stringResource(R.string.retry))
+            }
+        }
+    }
+}
+
