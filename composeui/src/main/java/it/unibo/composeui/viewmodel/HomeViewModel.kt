@@ -25,8 +25,6 @@ class HomeViewModel(
     private val _amount = MutableStateFlow("")
     private val _isDataReady = MutableStateFlow(false)
     private val _isError = MutableStateFlow(false)
-    val isError: StateFlow<Boolean> = _isError
-    val isDataReady: StateFlow<Boolean> = _isDataReady
     val amount: StateFlow<String> = _amount
 
     val result: StateFlow<Double?> = combine(_rate, _amount) { currentRate, currentAmount ->
@@ -89,40 +87,13 @@ class HomeViewModel(
         _amount.value = newAmount
     }
 
-    fun initializeIfNeeded() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (_currencies.value.isNotEmpty() && _latestRates.value.isNotEmpty()) {
-                    _isDataReady.value = true
-                    _isError.value = false
-                    return@launch
-                }
-                val list = getAvailableCurrenciesUseCase.invoke()
-                _currencies.value = list.map { it.code to it.name }
-
-
-                val result = mutableMapOf<String, Double>()
-                for ((code, _) in _currencies.value) {
-                    if (code != "EUR") {
-                        val rate = getRateUseCase.invoke("EUR", code).rate
-                        if (rate != 0.0) result[code] = rate
-                    }
-                }
-                _latestRates.value = result
-
-                if (_latestRates.value.isEmpty()) {
-                    _isError.value = true
-                    _isDataReady.value = false
-                    return@launch
-                }
-
-                _isDataReady.value = true
-                _isError.value = false
-            } catch (e: Exception) {
-                _isError.value = true
-                _isDataReady.value = false
-            }
-        }
+    fun setInitialData(
+        currencies: List<Pair<String, String>>,
+        latestRates: Map<String, Double>
+    ) {
+        _currencies.value = currencies
+        _latestRates.value = latestRates
+        _isDataReady.value = currencies.isNotEmpty() && latestRates.isNotEmpty()
+        _isError.value = currencies.isEmpty() || latestRates.isEmpty()
     }
-
 }
