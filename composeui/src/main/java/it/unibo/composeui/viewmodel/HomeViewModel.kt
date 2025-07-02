@@ -2,84 +2,49 @@ package it.unibo.composeui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
-import it.unibo.domain.usecase.currencyrate.GetRateUseCase
-import kotlinx.coroutines.Dispatchers
+import it.unibo.domain.usecase.home.CalculateConversionUseCase
+import it.unibo.domain.usecase.home.CalculateTopRatesUseCase
+import it.unibo.domain.usecase.home.GetSingleRateUseCase
+import it.unibo.domain.usecase.home.LoadHomeDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val getRateUseCase: GetRateUseCase,
-    private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase
+    private val loadHomeDataUseCase: LoadHomeDataUseCase,
+    private val calculateTopRatesUseCase: CalculateTopRatesUseCase,
+    private val calculateConversionUseCase: CalculateConversionUseCase,
+    private val getSingleRateUseCase: GetSingleRateUseCase
 ) : ViewModel() {
-    private val _rate = MutableStateFlow<Double?>(null)
+
     private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val currencies: StateFlow<List<Pair<String, String>>> = _currencies
 
     private val _latestRates = MutableStateFlow<Map<String, Double>>(emptyMap())
+    val top10Rates: StateFlow<Map<String, Double>> = _latestRates
+        .map { calculateTopRatesUseCase(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
     private val _amount = MutableStateFlow("")
-    private val _isDataReady = MutableStateFlow(false)
-    private val _isError = MutableStateFlow(false)
     val amount: StateFlow<String> = _amount
 
-    val result: StateFlow<Double?> = combine(_rate, _amount) { currentRate, currentAmount ->
-        val amountDouble = currentAmount.toDoubleOrNull()
-        if (amountDouble != null && currentRate != null) amountDouble * currentRate else null
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    private val _rate = MutableStateFlow<Double?>(null)
 
-    val top10Rates: StateFlow<Map<String, Double>> = _latestRates
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyMap()
-        )
-        .combine(_currencies) { rates, availableCurrencies ->
-            if (rates.isNotEmpty() && availableCurrencies.isNotEmpty()) {
-                rates.entries
-                    .sortedBy { it.value }
-                    .take(10)
-                    .associate { it.key to it.value }
-            } else {
-                emptyMap()
+    val result: StateFlow<Double?> = combine(_amount, _rate) { amount, rate ->
+        calculateConversionUseCase(amount, rate)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun loadInitialData() {
+        viewModelScope.launch {
+            loadHomeDataUseCase().onSuccess {
+                _currencies.value = it.currencies
+                _latestRates.value = it.rates
+            }.onFailure {
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyMap()
-        )
-
-
-    fun loadRate(base: String = "EUR", to: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val currencyRate = getRateUseCase.invoke(base, to)
-            _rate.value = currencyRate.rate
-        }
-    }
-
-    fun loadCurrencies() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val list = getAvailableCurrenciesUseCase.invoke()
-            _currencies.value = list.map { it.code to it.name }
-        }
-    }
-
-    fun loadAllRatesAgainstEuro(targets: List<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = mutableMapOf<String, Double>()
-            for (target in targets) {
-                val rate = getRateUseCase.invoke("EUR", target).rate
-                if (rate != 0.0) result[target] = rate
-            }
-            _latestRates.value = result
         }
     }
 
@@ -87,13 +52,18 @@ class HomeViewModel(
         _amount.value = newAmount
     }
 
+    fun loadRate(base: String = "EUR", to: String) {
+        viewModelScope.launch {
+            val rate = getSingleRateUseCase(base, to)
+            _rate.value = rate
+        }
+    }
+
     fun setInitialData(
         currencies: List<Pair<String, String>>,
-        latestRates: Map<String, Double>
+        rates: Map<String, Double>
     ) {
         _currencies.value = currencies
-        _latestRates.value = latestRates
-        _isDataReady.value = currencies.isNotEmpty() && latestRates.isNotEmpty()
-        _isError.value = currencies.isEmpty() || latestRates.isEmpty()
+        _latestRates.value = rates
     }
 }
