@@ -8,12 +8,10 @@ import it.unibo.domain.usecase.currencyrate.RefreshCacheUseCase
 import it.unibo.domain.usecase.wallet.AddEntryUseCase
 import it.unibo.domain.usecase.wallet.GetAllEntriesUseCase
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
-import it.unibo.domain.usecase.wallet.UpdateEntryUseCase
 import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCase
 
 class WalletViewModelFactory(
     private val addEntryUseCase: AddEntryUseCase,
-    private val updateEntryUseCase: UpdateEntryUseCase,
     private val removeEntryUseCase: RemoveEntryUseCase,
     private val getAllEntriesUseCase: GetAllEntriesUseCase,
     private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase,
@@ -27,7 +25,6 @@ class WalletViewModelFactory(
         if (modelClass.isAssignableFrom(WalletViewModel::class.java)) {
             return WalletViewModel(
                 addEntryUseCase = addEntryUseCase,
-                updateEntryUseCase = updateEntryUseCase,
                 removeEntryUseCase = removeEntryUseCase,
                 getAllEntriesUseCase = getAllEntriesUseCase,
                 getAvailableCurrenciesUseCase = getAvailableCurrenciesUseCase,

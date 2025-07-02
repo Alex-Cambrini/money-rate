@@ -10,7 +10,6 @@ import it.unibo.domain.usecase.currencyrate.RefreshCacheUseCase
 import it.unibo.domain.usecase.wallet.AddEntryUseCase
 import it.unibo.domain.usecase.wallet.GetAllEntriesUseCase
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
-import it.unibo.domain.usecase.wallet.UpdateEntryUseCase
 import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 
 class WalletViewModel(
     private val addEntryUseCase: AddEntryUseCase,
-    private val updateEntryUseCase: UpdateEntryUseCase,
     private val removeEntryUseCase: RemoveEntryUseCase,
     private val getAllEntriesUseCase: GetAllEntriesUseCase,
     private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase,
