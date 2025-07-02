@@ -10,12 +10,20 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.R
 import it.unibo.composeui.theme.Dimens
+import it.unibo.composeui.viewmodel.SplashViewModel
+import it.unibo.composeui.viewmodel.SplashViewModelFactory
+import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
+import it.unibo.domain.usecase.currencyrate.GetRateUseCase
 
 @Composable
 fun SplashScreen() {
@@ -27,15 +35,12 @@ fun SplashScreen() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = stringResource(
-                    R.string.splash_title
-                ),
+                text = stringResource(R.string.splash_title),
                 fontSize = Dimens.splashTitleSize,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(Dimens.splashSpacerHeight))
-
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -71,3 +76,37 @@ fun SplashScreenWithError(onRetry: () -> Unit) {
     }
 }
 
+@Composable
+fun SplashScreenHost(
+    splashViewModel: SplashViewModel,
+    onNavigateToHome: () -> Unit
+) {
+    val isReady by splashViewModel.isDataReady.collectAsState()
+    val isError by splashViewModel.isError.collectAsState()
+
+    LaunchedEffect(Unit) {
+        splashViewModel.initialize()
+    }
+
+    when {
+        isReady -> onNavigateToHome()
+        isError -> SplashScreenWithError(onRetry = { splashViewModel.initialize() })
+        else -> SplashScreen()
+    }
+}
+
+@Composable
+fun SplashScreenWrapper(
+    getRateUseCase: GetRateUseCase,
+    getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase,
+    onNavigateToHome: () -> Unit
+) {
+    val splashViewModel: SplashViewModel = viewModel(
+        factory = SplashViewModelFactory(getRateUseCase, getAvailableCurrenciesUseCase)
+    )
+
+    SplashScreenHost(
+        splashViewModel = splashViewModel,
+        onNavigateToHome = onNavigateToHome
+    )
+}

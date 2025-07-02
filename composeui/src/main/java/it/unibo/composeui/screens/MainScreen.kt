@@ -41,39 +41,8 @@ import it.unibo.data.NetworkCheckerImpl
 import it.unibo.domain.di.UseCaseProvider
 
 @Composable
-fun MainScreen() {
+fun MainScreen(homeViewModel: HomeViewModel, mainViewModel: MainViewModel) {
     val navController = rememberNavController()
-
-    val homeViewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(
-            UseCaseProvider.getRateUseCase,
-            UseCaseProvider.getAvailableCurrenciesUseCase
-        )
-    )
-
-    val mainViewModel: MainViewModel = viewModel(
-        factory = MainViewModelFactory(
-            NetworkCheckerImpl(LocalContext.current)
-        )
-    )
-
-    val isDataReady by homeViewModel.isDataReady.collectAsState()
-    val isError by homeViewModel.isError.collectAsState()
-
-    LaunchedEffect(Unit) {
-        homeViewModel.initializeIfNeeded()
-    }
-
-    if (!isDataReady) {
-        if (isError) {
-            SplashScreenWithError(
-                onRetry = { homeViewModel.initializeIfNeeded() }
-            )
-        } else {
-            SplashScreen()
-        }
-        return
-    }
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
