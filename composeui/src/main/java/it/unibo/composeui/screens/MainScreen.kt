@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,6 +44,37 @@ import it.unibo.domain.di.UseCaseProvider
 fun MainScreen() {
     val navController = rememberNavController()
 
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(
+            UseCaseProvider.getRateUseCase,
+            UseCaseProvider.getAvailableCurrenciesUseCase
+        )
+    )
+
+    val mainViewModel: MainViewModel = viewModel(
+        factory = MainViewModelFactory(
+            NetworkCheckerImpl(LocalContext.current)
+        )
+    )
+
+    val isDataReady by homeViewModel.isDataReady.collectAsState()
+    val isError by homeViewModel.isError.collectAsState()
+
+    LaunchedEffect(Unit) {
+        homeViewModel.initializeIfNeeded()
+    }
+
+    if (!isDataReady) {
+        if (isError) {
+            SplashScreenWithError(
+                onRetry = { homeViewModel.initializeIfNeeded() }
+            )
+        } else {
+            SplashScreen()
+        }
+        return
+    }
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
@@ -57,12 +89,6 @@ fun MainScreen() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 composable("home") {
-                    val homeViewModel: HomeViewModel = viewModel(
-                        factory = HomeViewModelFactory(
-                            UseCaseProvider.getRateUseCase,
-                            UseCaseProvider.getAvailableCurrenciesUseCase
-                        )
-                    )
                     HomeScreen(viewModel = homeViewModel)
                 }
                 composable("wallet") {
@@ -75,17 +101,12 @@ fun MainScreen() {
                             UseCaseProvider.getAvailableCurrenciesUseCase,
                             UseCaseProvider.refreshCacheUseCase,
                             UseCaseProvider.getCachedRatesUseCase
-
                         )
                     )
                     WalletScreen(viewModel = walletViewModel)
                 }
             }
-            val mainViewModel: MainViewModel = viewModel(
-                factory = MainViewModelFactory(
-                    NetworkCheckerImpl(LocalContext.current)
-                )
-            )
+
             ConnectionStatusBanner(
                 viewModel = mainViewModel,
                 modifier = Modifier.align(Alignment.TopCenter)
