@@ -10,6 +10,7 @@ class SplashViewModelFactory(
     private val getRateUseCase: GetRateUseCase,
     private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase
 ) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SplashViewModel::class.java)) {
             return SplashViewModel(getRateUseCase, getAvailableCurrenciesUseCase) as T
