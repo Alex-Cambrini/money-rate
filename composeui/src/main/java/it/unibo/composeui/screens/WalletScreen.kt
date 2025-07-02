@@ -256,21 +256,29 @@ fun WalletScreen(viewModel: WalletViewModel) {
         )
     }
 
+    var triedSave by remember { mutableStateOf(false) }
+    val errorMessage by viewModel.errorMessage.collectAsState()
     val entryToEdit = entries.find { it.id == editEntryId }
+
     if (entryToEdit != null) {
-        val errorMessage by viewModel.errorMessage.collectAsState()
         EditWalletDialog(
             errorMessage = errorMessage,
             onDismiss = {
                 viewModel.clearError()
+                triedSave = false
                 editEntryId = null
             },
             onConfirm = { delta ->
                 viewModel.modifyWallet(entryToEdit, delta)
-                viewModel.clearError()
-                editEntryId = null
+                triedSave = true
             }
         )
+    }
+
+    if (triedSave && errorMessage == null) {
+        viewModel.clearError()
+        triedSave = false
+        editEntryId = null
     }
 
     val entryToDelete = entries.find { it.id == deleteEntryId }
