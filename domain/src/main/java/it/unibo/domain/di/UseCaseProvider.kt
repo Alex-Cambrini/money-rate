@@ -16,6 +16,8 @@ import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCaseImpl
 import it.unibo.domain.usecase.wallet.UpdateEntryUseCase
 import it.unibo.domain.usecase.wallet.UpdateEntryUseCaseImpl
+import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCase
+import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCaseImpl
 
 object UseCaseProvider {
     // currency
@@ -31,6 +33,8 @@ object UseCaseProvider {
     lateinit var getAllEntriesUseCase: GetAllEntriesUseCase
     lateinit var removeEntryUseCase: RemoveEntryUseCase
     lateinit var updateEntryUseCase: UpdateEntryUseCase
+    lateinit var updateWalletAmountUseCase: UpdateWalletAmountUseCase
+
 
     fun setup(repositoryProvider: RepositoryProvider) {
         getAvailableCurrenciesUseCase = GetAvailableCurrenciesUseCaseImpl(
@@ -55,6 +59,9 @@ object UseCaseProvider {
             walletRepository = repositoryProvider.walletRepository
         )
         updateEntryUseCase = UpdateEntryUseCaseImpl(
+            walletRepository = repositoryProvider.walletRepository
+        )
+        updateWalletAmountUseCase = UpdateWalletAmountUseCaseImpl(
             walletRepository = repositoryProvider.walletRepository
         )
     }
