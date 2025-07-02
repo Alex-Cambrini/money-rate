@@ -15,7 +15,7 @@ class InitializeAppDataUseCase(
 
     sealed class Result {
         data class Success(val data: AppData) : Result()
-        object Failure : Result()
+        data object Failure : Result()
     }
 
     suspend operator fun invoke(): Result {
