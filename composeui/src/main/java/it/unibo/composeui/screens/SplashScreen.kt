@@ -79,25 +79,22 @@ fun SplashScreenHost(
     homeViewModel: HomeViewModel,
     onNavigateToHome: () -> Unit
 ) {
-    val isReady by splashViewModel.isDataReady.collectAsState()
-    val isError by splashViewModel.isError.collectAsState()
-
     LaunchedEffect(Unit) {
         splashViewModel.initialize()
     }
 
-    LaunchedEffect(isReady) {
-        if (isReady) {
-            homeViewModel.setInitialData(
-                splashViewModel.currencies.value,
-                splashViewModel.latestRates.value
-            )
-            onNavigateToHome()
+    val state by splashViewModel.state.collectAsState()
+
+    when (state) {
+        is SplashViewModel.State.Loading -> SplashScreen()
+        is SplashViewModel.State.Error -> SplashScreenWithError(onRetry = { splashViewModel.initialize() })
+        is SplashViewModel.State.Success -> {
+            val success = state as SplashViewModel.State.Success
+            LaunchedEffect(Unit) {
+                homeViewModel.setInitialData(success.currencies, success.rates)
+                onNavigateToHome()
+            }
         }
     }
-
-    when {
-        isError -> SplashScreenWithError(onRetry = { splashViewModel.initialize() })
-        else -> SplashScreen()
-    }
 }
+

@@ -19,6 +19,7 @@ import it.unibo.data.NetworkCheckerImpl
 import it.unibo.domain.di.UseCaseProvider
 import it.unibo.composeui.viewmodel.HomeViewModelFactory
 import it.unibo.composeui.viewmodel.SplashViewModelFactory
+import it.unibo.domain.usecase.InitializeAppDataUseCase
 
 
 class MainActivity : ComponentActivity() {
@@ -37,6 +38,11 @@ class MainActivity : ComponentActivity() {
 fun AppEntryPoint() {
     val context = LocalContext.current
 
+    val initializeAppDataUseCase = InitializeAppDataUseCase(
+        UseCaseProvider.getAvailableCurrenciesUseCase,
+        UseCaseProvider.getRateUseCase
+    )
+
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
             UseCaseProvider.getRateUseCase,
@@ -50,8 +56,7 @@ fun AppEntryPoint() {
 
     val splashViewModel: SplashViewModel = viewModel(
         factory = SplashViewModelFactory(
-            UseCaseProvider.getRateUseCase,
-            UseCaseProvider.getAvailableCurrenciesUseCase
+            initializeAppDataUseCase
         )
     )
 
@@ -63,13 +68,7 @@ fun AppEntryPoint() {
         SplashScreenHost(
             splashViewModel = splashViewModel,
             homeViewModel = homeViewModel,
-            onNavigateToHome = {
-                homeViewModel.setInitialData(
-                    splashViewModel.currencies.value,
-                    splashViewModel.latestRates.value
-                )
-                showMainScreen.value = true
-            }
+            onNavigateToHome = { showMainScreen.value = true }
         )
     }
 }
