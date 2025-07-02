@@ -17,13 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.R
 import it.unibo.composeui.theme.Dimens
+import it.unibo.composeui.viewmodel.HomeViewModel
 import it.unibo.composeui.viewmodel.SplashViewModel
-import it.unibo.composeui.viewmodel.SplashViewModelFactory
-import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
-import it.unibo.domain.usecase.currencyrate.GetRateUseCase
 
 @Composable
 fun SplashScreen() {
@@ -79,6 +76,7 @@ fun SplashScreenWithError(onRetry: () -> Unit) {
 @Composable
 fun SplashScreenHost(
     splashViewModel: SplashViewModel,
+    homeViewModel: HomeViewModel,
     onNavigateToHome: () -> Unit
 ) {
     val isReady by splashViewModel.isDataReady.collectAsState()
@@ -88,25 +86,18 @@ fun SplashScreenHost(
         splashViewModel.initialize()
     }
 
+    LaunchedEffect(isReady) {
+        if (isReady) {
+            homeViewModel.setInitialData(
+                splashViewModel.currencies.value,
+                splashViewModel.latestRates.value
+            )
+            onNavigateToHome()
+        }
+    }
+
     when {
-        isReady -> onNavigateToHome()
         isError -> SplashScreenWithError(onRetry = { splashViewModel.initialize() })
         else -> SplashScreen()
     }
-}
-
-@Composable
-fun SplashScreenWrapper(
-    getRateUseCase: GetRateUseCase,
-    getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase,
-    onNavigateToHome: () -> Unit
-) {
-    val splashViewModel: SplashViewModel = viewModel(
-        factory = SplashViewModelFactory(getRateUseCase, getAvailableCurrenciesUseCase)
-    )
-
-    SplashScreenHost(
-        splashViewModel = splashViewModel,
-        onNavigateToHome = onNavigateToHome
-    )
 }
