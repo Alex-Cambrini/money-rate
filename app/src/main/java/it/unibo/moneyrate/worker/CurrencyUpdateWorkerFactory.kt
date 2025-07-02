@@ -18,6 +18,7 @@ class CurrencyUpdateWorkerFactory(
         return when (workerClassName) {
             CurrencyUpdateWorker::class.java.name ->
                 CurrencyUpdateWorker(appContext, workerParameters, repository)
+
             else -> null
         }
     }

@@ -6,19 +6,19 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
-import it.unibo.composeui.screens.SplashScreenHost
+import androidx.lifecycle.viewmodel.compose.viewModel
 import it.unibo.composeui.screens.MainScreen
+import it.unibo.composeui.screens.SplashScreenHost
 import it.unibo.composeui.theme.MoneyRateTheme
 import it.unibo.composeui.viewmodel.HomeViewModel
+import it.unibo.composeui.viewmodel.HomeViewModelFactory
 import it.unibo.composeui.viewmodel.MainViewModel
 import it.unibo.composeui.viewmodel.MainViewModelFactory
 import it.unibo.composeui.viewmodel.SplashViewModel
+import it.unibo.composeui.viewmodel.SplashViewModelFactory
 import it.unibo.data.NetworkCheckerImpl
 import it.unibo.domain.di.UseCaseProvider
-import it.unibo.composeui.viewmodel.HomeViewModelFactory
-import it.unibo.composeui.viewmodel.SplashViewModelFactory
 import it.unibo.domain.usecase.InitializeAppDataUseCase
 
 

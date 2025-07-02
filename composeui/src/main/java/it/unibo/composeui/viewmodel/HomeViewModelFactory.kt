@@ -16,7 +16,8 @@ class HomeViewModelFactory(
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            val loadHomeDataUseCase = LoadHomeDataUseCase(getAvailableCurrenciesUseCase, getRateUseCase)
+            val loadHomeDataUseCase =
+                LoadHomeDataUseCase(getAvailableCurrenciesUseCase, getRateUseCase)
             val calculateTopRatesUseCase = CalculateTopRatesUseCase()
             val calculateConversionUseCase = CalculateConversionUseCase()
             val getSingleRateUseCase = GetSingleRateUseCase(getRateUseCase)
