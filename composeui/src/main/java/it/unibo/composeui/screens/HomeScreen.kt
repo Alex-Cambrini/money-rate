@@ -67,10 +67,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(Unit) { viewModel.loadCurrencies() }
-    LaunchedEffect(availableCurrencies) {
-        if (availableCurrencies.isNotEmpty())
-            viewModel.loadAllRatesAgainstEuro(availableCurrencies.map { it.first }.filter { it != "EUR" })
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialData()
     }
 
     Scaffold { padding ->
