@@ -258,11 +258,16 @@ fun WalletScreen(viewModel: WalletViewModel) {
 
     val entryToEdit = entries.find { it.id == editEntryId }
     if (entryToEdit != null) {
+        val errorMessage by viewModel.errorMessage.collectAsState()
         EditWalletDialog(
-            initialAmount = entryToEdit.amount,
-            onDismiss = { editEntryId = null },
+            errorMessage = errorMessage,
+            onDismiss = {
+                viewModel.clearError()
+                editEntryId = null
+            },
             onConfirm = { delta ->
                 viewModel.modifyWallet(entryToEdit, delta)
+                viewModel.clearError()
                 editEntryId = null
             }
         )
@@ -347,18 +352,16 @@ fun AddWalletDialog(
 
 @Composable
 fun EditWalletDialog(
-    initialAmount: Double,
+    errorMessage: String?,
     onDismiss: () -> Unit,
     onConfirm: (Double) -> Unit
 ) {
     var amountText by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val isDark = isSystemInDarkTheme()
     val backgroundColor = if (isDark) DarkBackground else Background
     val textColor =
         if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
-    val minBalanceError = stringResource(R.string.min_balance_error)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -385,7 +388,7 @@ fun EditWalletDialog(
                 if (errorMessage != null) {
                     Spacer(modifier = Modifier.height(Dimens.elementSpacing))
                     Text(
-                        text = errorMessage!!,
+                        text = errorMessage,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -395,14 +398,7 @@ fun EditWalletDialog(
             TextButton(onClick = {
                 val delta = amountText.toDoubleOrNull()
                 if (delta != null) {
-                    val newAmount = initialAmount + delta
-                    val roundedAmount = "%.2f".format(newAmount).toDouble()
-                    if (roundedAmount >= 0.01) {
-                        onConfirm(delta)
-                        errorMessage = null
-                    } else {
-                        errorMessage = minBalanceError
-                    }
+                    onConfirm(delta)
                 }
             }) {
                 Text(stringResource(R.string.save), color = textColor)
