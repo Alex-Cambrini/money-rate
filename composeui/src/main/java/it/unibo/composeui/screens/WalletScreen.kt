@@ -459,7 +459,7 @@ fun DropdownMenuCurrencySelector(
                     enabled = true
                 )
                 .fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
+            colors = TextFieldDefaults.colors(
                 focusedContainerColor = backgroundColor,
                 unfocusedContainerColor = backgroundColor,
                 focusedTextColor = textColor,

@@ -16,12 +16,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -32,12 +30,9 @@ import androidx.navigation.compose.rememberNavController
 import it.unibo.composeui.R
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
-import it.unibo.composeui.viewmodel.HomeViewModelFactory
 import it.unibo.composeui.viewmodel.MainViewModel
-import it.unibo.composeui.viewmodel.MainViewModelFactory
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.composeui.viewmodel.WalletViewModelFactory
-import it.unibo.data.NetworkCheckerImpl
 import it.unibo.domain.di.UseCaseProvider
 
 @Composable

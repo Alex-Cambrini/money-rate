@@ -70,7 +70,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
     LaunchedEffect(Unit) { viewModel.loadCurrencies() }
     LaunchedEffect(availableCurrencies) {
         if (availableCurrencies.isNotEmpty())
-            viewModel.loadAllRatesAgainstEuro(availableCurrencies.map { it.first }.filter { it != "EUR" })
+            viewModel.loadAllRatesAgainstEuro(availableCurrencies.map { it.first }
+                .filter { it != "EUR" })
     }
 
     Scaffold { padding ->
@@ -86,7 +87,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)) {
+                Column(
+                    Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
+                ) {
                     CurrencyDropdown(
                         label = stringResource(R.string.base_currency),
                         selectedCurrency = baseCurrency,
@@ -124,13 +128,22 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         baseCurrency = targetCurrency.also { targetCurrency = baseCurrency }
                         viewModel.loadRate(baseCurrency, targetCurrency)
                     },
-                    modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically)
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.CenterVertically)
                 ) {
-                    Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.swap_currencies))
+                    Icon(
+                        Icons.Filled.SwapVert,
+                        contentDescription = stringResource(R.string.swap_currencies)
+                    )
                 }
             }
 
-            AmountInput(amount, onAmountChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) viewModel.updateAmount(it) })
+            AmountInput(
+                amount,
+                onAmountChange = {
+                    if (it.all { ch -> ch.isDigit() || ch == '.' }) viewModel.updateAmount(it)
+                })
 
             ConvertButton(enabled = amount.toDoubleOrNull() != null) {
                 viewModel.loadRate(baseCurrency, targetCurrency)
@@ -139,7 +152,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
             ResultDisplay(result, amount, baseCurrency, targetCurrency)
 
             if (top10Rates.isNotEmpty()) {
-                Text(stringResource(R.string.ordered_by_strength), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.ordered_by_strength),
+                    style = MaterialTheme.typography.titleMedium
+                )
                 CurrencyBarChart(top10Rates)
             }
         }
