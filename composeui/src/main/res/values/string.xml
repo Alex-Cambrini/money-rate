@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="no_wallets">No wallets available.</string>
+    <string name="no_wallets">No wallets available. Press + to add a new one and get started.</string>
     <string name="wallets">Wallets</string>
     <string name="add_wallet">Add Wallet</string>
     <string name="edit_amount">Edit Amount</string>
