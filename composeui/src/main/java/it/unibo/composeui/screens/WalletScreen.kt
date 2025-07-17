@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,7 +32,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
@@ -55,8 +54,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.unibo.composeui.R
+import it.unibo.composeui.components.WalletEntryCard
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
@@ -169,10 +170,29 @@ fun WalletScreen(viewModel: WalletViewModel) {
 
             item {
                 if (entries.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.no_wallets),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                        elevation = CardDefaults.cardElevation(1.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.AccountBalanceWallet,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.no_wallets),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
                 } else {
                     Text(
                         text = stringResource(R.string.wallets),
@@ -182,63 +202,13 @@ fun WalletScreen(viewModel: WalletViewModel) {
             }
 
             items(entries) { item ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(Dimens.cardPadding),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            Text(item.currencyCode, style = MaterialTheme.typography.bodyMedium)
-                            Text(item.currencyName, style = MaterialTheme.typography.bodySmall)
-                        }
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(
-                                "%.2f".format(item.amount),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            val euroValue = if (rates.isNotEmpty()) {
-                                viewModel.convertToEuro(item, rates)
-                            } else {
-                                0.0
-                            }
-                            Text(
-                                "%.2f€".format(euroValue),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Row {
-                                IconButton(onClick = { editEntryId = item.id }) {
-                                    Icon(
-                                        Icons.Default.Edit,
-                                        contentDescription = stringResource(R.string.edit_description)
-                                    )
-                                }
-                                IconButton(onClick = { deleteEntryId = item.id }) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = stringResource(R.string.delete_description)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+                WalletEntryCard(
+                    entry = item,
+                    rates = rates,
+                    onEdit = { editEntryId = it },
+                    onDelete = { deleteEntryId = it },
+                    viewModel = viewModel
+                )
             }
         }
     }
