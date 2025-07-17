@@ -35,8 +35,10 @@ class HomeViewModel(
     private val _rate = MutableStateFlow<Double?>(null)
 
     val result: StateFlow<Double?> = combine(_amount, _rate) { amount, rate ->
-        calculateConversionUseCase(amount, rate)
+        val normalizedAmount = amount.replace(',', '.')
+        calculateConversionUseCase(normalizedAmount, rate)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
 
     fun loadInitialData() {
         viewModelScope.launch {
@@ -46,6 +48,10 @@ class HomeViewModel(
             }.onFailure {
             }
         }
+    }
+
+    fun resetResult() {
+        _rate.value = null
     }
 
     fun updateAmount(newAmount: String) {
