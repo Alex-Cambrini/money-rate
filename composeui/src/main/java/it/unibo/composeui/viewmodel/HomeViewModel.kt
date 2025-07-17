@@ -6,6 +6,7 @@ import it.unibo.domain.usecase.home.CalculateConversionUseCase
 import it.unibo.domain.usecase.home.CalculateTopRatesUseCase
 import it.unibo.domain.usecase.home.GetSingleRateUseCase
 import it.unibo.domain.usecase.home.LoadHomeDataUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,11 +19,14 @@ class HomeViewModel(
     private val loadHomeDataUseCase: LoadHomeDataUseCase,
     private val calculateTopRatesUseCase: CalculateTopRatesUseCase,
     private val calculateConversionUseCase: CalculateConversionUseCase,
-    private val getSingleRateUseCase: GetSingleRateUseCase
+    private val getSingleRateUseCase: GetSingleRateUseCase,
 ) : ViewModel() {
 
     private val _currencies = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val currencies: StateFlow<List<Pair<String, String>>> = _currencies
+
+    private val _isLoadingRate = MutableStateFlow(false)
+    val isLoadingRate: StateFlow<Boolean> = _isLoadingRate
 
     private val _latestRates = MutableStateFlow<Map<String, Double>>(emptyMap())
     val top10Rates: StateFlow<Map<String, Double>> = _latestRates
@@ -41,7 +45,7 @@ class HomeViewModel(
 
 
     fun loadInitialData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             loadHomeDataUseCase().onSuccess {
                 _currencies.value = it.currencies
                 _latestRates.value = it.rates
@@ -58,12 +62,16 @@ class HomeViewModel(
         _amount.value = newAmount
     }
 
+
     fun loadRate(base: String = "EUR", to: String) {
-        viewModelScope.launch {
-            val rate = getSingleRateUseCase(base, to)
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoadingRate.value = true
+            val rate = getSingleRateUseCase.invoke(base, to)
             _rate.value = rate
+            _isLoadingRate.value = false
         }
     }
+
 
     fun setInitialData(
         currencies: List<Pair<String, String>>,
