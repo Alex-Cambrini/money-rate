@@ -19,7 +19,7 @@
     <string name="target_currency">Target Currency</string>
     <string name="swap_currencies">Swap currencies</string>
     <string name="convert">Convert</string>
-    <string name="ordered_by_strength">Currencies ordered by strength (based on 1 EUR)</string>
+    <string name="ordered_by_strength">Purchasing power of 1 EUR in other currencies</string>
     <string name="home_label">Home</string>
     <string name="wallet_label">Wallet</string>
     <string name="no_connection">No internet connection</string>
