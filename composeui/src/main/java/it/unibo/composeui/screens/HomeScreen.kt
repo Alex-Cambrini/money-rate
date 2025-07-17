@@ -1,5 +1,6 @@
 package it.unibo.composeui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,13 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -38,15 +42,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.unibo.composeui.R
+import it.unibo.composeui.components.CurrencyInputRow
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
@@ -58,17 +67,30 @@ fun HomeScreen(viewModel: HomeViewModel) {
     val result by viewModel.result.collectAsStateWithLifecycle(null)
     val top10Rates by viewModel.top10Rates.collectAsStateWithLifecycle(emptyMap())
     val availableCurrencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
+    var convertClicked by remember { mutableStateOf(false) }
 
     var baseCurrency by remember { mutableStateOf("EUR") }
     var targetCurrency by remember { mutableStateOf("USD") }
-    var baseExpanded by remember { mutableStateOf(false) }
-    var targetExpanded by remember { mutableStateOf(false) }
+    var baseAmount by remember { mutableStateOf(TextFieldValue(amount)) }
+    var targetAmount by remember { mutableStateOf(TextFieldValue("")) }
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
+    var rotated by remember { mutableStateOf(false) }
+    val rotation by animateFloatAsState(if (rotated) 180f else 0f)
+
     LaunchedEffect(Unit) {
         viewModel.loadInitialData()
+    }
+
+    LaunchedEffect(result, convertClicked) {
+        if (convertClicked && result != null) {
+            val formatter = java.text.NumberFormat.getNumberInstance(java.util.Locale.ITALY)
+            formatter.maximumFractionDigits = 4
+            targetAmount = TextFieldValue(formatter.format(result))
+            convertClicked = false
+        }
     }
 
     Scaffold { padding ->
@@ -80,70 +102,98 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                elevation = CardDefaults.cardElevation(1.dp)
             ) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)) {
-                    CurrencyDropdown(
-                        label = stringResource(R.string.base_currency),
-                        selectedCurrency = baseCurrency,
-                        expanded = baseExpanded,
-                        onExpandedChange = {
-                            baseExpanded = it
-                            if (it) focusManager.clearFocus(true)
-                        },
-                        onCurrencySelected = {
-                            baseCurrency = it
-                            baseExpanded = false
-                        },
-                        currencies = availableCurrencies,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    CurrencyDropdown(
-                        label = stringResource(R.string.target_currency),
-                        selectedCurrency = targetCurrency,
-                        expanded = targetExpanded,
-                        onExpandedChange = {
-                            targetExpanded = it
-                            if (it) focusManager.clearFocus(true)
-                        },
-                        onCurrencySelected = {
-                            targetCurrency = it
-                            targetExpanded = false
-                        },
-                        currencies = availableCurrencies,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                Spacer(Modifier.width(Dimens.elementSpacing))
-                Button(
-                    onClick = {
-                        baseCurrency = targetCurrency.also { targetCurrency = baseCurrency }
-                        viewModel.loadRate(baseCurrency, targetCurrency)
-                    },
-                    modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically)
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(Icons.Filled.SwapVert, contentDescription = stringResource(R.string.swap_currencies))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            CurrencyInputRow(
+                                currency = baseCurrency,
+                                amount = baseAmount,
+                                onCurrencyChange = { baseCurrency = it },
+                                onAmountChange = { newTextValue ->
+                                    baseAmount = newTextValue
+                                    viewModel.updateAmount(newTextValue.text)
+                                },
+                                currencies = availableCurrencies
+                            )
+
+
+                            CurrencyInputRow(
+                                currency = targetCurrency,
+                                onCurrencyChange = {
+                                    targetCurrency = it
+                                    focusManager.clearFocus(true)
+                                },
+                                amount = targetAmount,
+                                onAmountChange = {
+                                    targetAmount = it
+                                    viewModel.updateAmount(it.text)
+                                },
+                                currencies = availableCurrencies
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.wrapContentWidth()
+                        ) {
+                            Button(onClick = {
+                                rotated = !rotated
+                                baseCurrency = targetCurrency.also { targetCurrency = baseCurrency }
+
+                                val tempAmount = baseAmount
+                                baseAmount = TextFieldValue(targetAmount.text, TextRange(targetAmount.text.length))
+                                targetAmount = TextFieldValue(tempAmount.text, TextRange(tempAmount.text.length))
+
+                                viewModel.resetResult()
+                                viewModel.updateAmount(baseAmount.text)
+                                viewModel.loadRate(baseCurrency, targetCurrency)
+                            })  {
+                                Icon(
+                                    Icons.Filled.SwapVert,
+                                    contentDescription = stringResource(R.string.swap_currencies),
+                                    modifier = Modifier.rotate(rotation)
+                                )
+                            }
+                        }
+                    }
+
+                    ConvertButton(enabled = baseAmount.text.replace(',', '.').toDoubleOrNull() != null) {
+                        println("Convert clicked: baseAmount=$baseAmount, baseCurrency=$baseCurrency, targetCurrency=$targetCurrency")
+                        convertClicked = true
+                        viewModel.loadRate(baseCurrency, targetCurrency)
+                    }
                 }
             }
-
-            AmountInput(amount, onAmountChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) viewModel.updateAmount(it) })
-
-            ConvertButton(enabled = amount.toDoubleOrNull() != null) {
-                viewModel.loadRate(baseCurrency, targetCurrency)
-            }
-
-            ResultDisplay(result, amount, baseCurrency, targetCurrency)
 
             if (top10Rates.isNotEmpty()) {
-                Text(stringResource(R.string.ordered_by_strength), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.ordered_by_strength),
+                    style = MaterialTheme.typography.titleMedium
+                )
                 CurrencyBarChart(top10Rates)
             }
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
