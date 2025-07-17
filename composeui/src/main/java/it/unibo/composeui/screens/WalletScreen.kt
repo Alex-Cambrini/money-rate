@@ -110,9 +110,8 @@ fun WalletScreen(viewModel: WalletViewModel) {
         }
     ) { padding ->
         LazyColumn(
-            contentPadding = padding,
             modifier = Modifier
-                .padding(Dimens.elementSpacing)
+                .padding(padding)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
         ) {
