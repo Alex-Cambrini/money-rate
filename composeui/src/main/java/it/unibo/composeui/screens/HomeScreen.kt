@@ -12,9 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.Button
@@ -62,8 +61,6 @@ fun HomeScreen(viewModel: HomeViewModel) {
     var targetAmount by remember { mutableStateOf(TextFieldValue("")) }
     var lastInputSource by remember { mutableStateOf("base") }
 
-    val scrollState = rememberScrollState()
-
     var rotated by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(if (rotated) 180f else 0f)
 
@@ -87,109 +84,127 @@ fun HomeScreen(viewModel: HomeViewModel) {
     }
 
     Scaffold { padding ->
-        Column(
+        LazyColumn(
+            contentPadding = padding,
             modifier = Modifier
-                .padding(padding)
-                .padding(Dimens.screenPadding)
-                .fillMaxSize()
-                .verticalScroll(scrollState),
+                .padding(Dimens.elementSpacing)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
-            Text(
-                text = stringResource(R.string.title_currency_converter),
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-                elevation = CardDefaults.cardElevation(1.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+            item {
+                Text(
+                    text = stringResource(R.string.title_currency_converter),
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                    elevation = CardDefaults.cardElevation(1.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            CurrencyInputRow(
-                                currency = baseCurrency,
-                                amount = baseAmount,
-                                onCurrencyChange = { baseCurrency = it },
-                                onAmountChange = {
-                                    baseAmount = it
-                                    lastInputSource = "base"
-                                    viewModel.updateAmount(it.text)
-                                },
-                                currencies = availableCurrencies
-                            )
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                CurrencyInputRow(
+                                    currency = baseCurrency,
+                                    amount = baseAmount,
+                                    onCurrencyChange = { baseCurrency = it },
+                                    onAmountChange = {
+                                        baseAmount = it
+                                        lastInputSource = "base"
+                                        viewModel.updateAmount(it.text)
+                                    },
+                                    currencies = availableCurrencies
+                                )
 
-                            CurrencyInputRow(
-                                currency = targetCurrency,
-                                amount = targetAmount,
-                                onCurrencyChange = { targetCurrency = it },
-                                onAmountChange = {
-                                    targetAmount = it
-                                    lastInputSource = "target"
-                                    viewModel.updateAmount(it.text)
-                                },
-                                currencies = availableCurrencies
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.wrapContentWidth()
-                        ) {
-                            Button(onClick = {
-                                rotated = !rotated
-                                baseCurrency = targetCurrency.also { targetCurrency = baseCurrency }
-
-                                val tempAmount = baseAmount
-                                baseAmount = TextFieldValue(targetAmount.text, TextRange(targetAmount.text.length))
-                                targetAmount = TextFieldValue(tempAmount.text, TextRange(tempAmount.text.length))
-
-                                viewModel.resetResult()
-                                viewModel.updateAmount(baseAmount.text)
-                                viewModel.loadRate(baseCurrency, targetCurrency)
-                            })  {
-                                Icon(
-                                    Icons.Filled.SwapVert,
-                                    contentDescription = stringResource(R.string.swap_currencies),
-                                    modifier = Modifier.rotate(rotation)
+                                CurrencyInputRow(
+                                    currency = targetCurrency,
+                                    amount = targetAmount,
+                                    onCurrencyChange = { targetCurrency = it },
+                                    onAmountChange = {
+                                        targetAmount = it
+                                        lastInputSource = "target"
+                                        viewModel.updateAmount(it.text)
+                                    },
+                                    currencies = availableCurrencies
                                 )
                             }
-                        }
-                    }
 
-                    val inputText = if (lastInputSource == "base") baseAmount.text else targetAmount.text
-                    ConvertButton(enabled = inputText.replace(',', '.').toDoubleOrNull() != null) {
-                        convertClicked = true
-                        if (lastInputSource == "base") {
-                            viewModel.loadRate(baseCurrency, targetCurrency)
-                        } else {
-                            viewModel.loadRate(targetCurrency, baseCurrency)
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.wrapContentWidth()
+                            ) {
+                                Button(onClick = {
+                                    rotated = !rotated
+                                    baseCurrency =
+                                        targetCurrency.also { targetCurrency = baseCurrency }
+
+                                    val tempAmount = baseAmount
+                                    baseAmount = TextFieldValue(
+                                        targetAmount.text,
+                                        TextRange(targetAmount.text.length)
+                                    )
+                                    targetAmount = TextFieldValue(
+                                        tempAmount.text,
+                                        TextRange(tempAmount.text.length)
+                                    )
+
+                                    viewModel.resetResult()
+                                    viewModel.updateAmount(baseAmount.text)
+                                    viewModel.loadRate(baseCurrency, targetCurrency)
+                                }) {
+                                    Icon(
+                                        Icons.Filled.SwapVert,
+                                        contentDescription = stringResource(R.string.swap_currencies),
+                                        modifier = Modifier.rotate(rotation)
+                                    )
+                                }
+                            }
+                        }
+
+                        val inputText =
+                            if (lastInputSource == "base") baseAmount.text else targetAmount.text
+                        ConvertButton(
+                            enabled = inputText.replace(',', '.').toDoubleOrNull() != null
+                        ) {
+                            convertClicked = true
+                            if (lastInputSource == "base") {
+                                viewModel.loadRate(baseCurrency, targetCurrency)
+                            } else {
+                                viewModel.loadRate(targetCurrency, baseCurrency)
+                            }
                         }
                     }
                 }
             }
 
             if (top5Rates.isNotEmpty()) {
-                Text(
-                    stringResource(R.string.ordered_by_strength),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                CurrencyBarChart(top5Rates)
+                item {
+                    Text(
+                        stringResource(R.string.ordered_by_strength),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                item {
+                    CurrencyBarChart(top5Rates)
+                }
             }
         }
     }
