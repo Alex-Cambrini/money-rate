@@ -2,8 +2,6 @@ package it.unibo.composeui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,24 +14,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,14 +40,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.unibo.composeui.R
 import it.unibo.composeui.components.CurrencyInputRow
-import it.unibo.composeui.theme.Background
-import it.unibo.composeui.theme.DarkBackground
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
 
@@ -195,94 +182,6 @@ fun HomeScreen(viewModel: HomeViewModel) {
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CurrencyDropdown(
-    label: String,
-    selectedCurrency: String,
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    onCurrencySelected: (String) -> Unit,
-    currencies: List<Pair<String, String>>,
-    modifier: Modifier = Modifier
-) {
-    val isDark = isSystemInDarkTheme()
-    val backgroundColor = if (isDark) DarkBackground else Background
-    val textColor =
-        if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = onExpandedChange,
-        modifier = modifier
-    ) {
-        TextField(
-            value = selectedCurrency,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor(
-                type = MenuAnchorType.PrimaryNotEditable,
-                enabled = true
-            ),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = backgroundColor,
-                unfocusedContainerColor = backgroundColor,
-                focusedTextColor = textColor,
-                unfocusedTextColor = textColor,
-                focusedLabelColor = textColor,
-                unfocusedLabelColor = textColor,
-                focusedTrailingIconColor = textColor,
-                unfocusedTrailingIconColor = textColor
-            )
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) },
-            modifier = Modifier.background(backgroundColor)
-        ) {
-            currencies.forEach { (code, name) ->
-                DropdownMenuItem(
-                    text = { Text("$code - $name", color = textColor) },
-                    onClick = {
-                        onCurrencySelected(code)
-                        onExpandedChange(false)
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun AmountInput(amount: String, onAmountChange: (String) -> Unit) {
-    val isDark = isSystemInDarkTheme()
-    val backgroundColor = if (isDark) DarkBackground else Background
-    val textColor =
-        if (isDark) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurface
-
-    TextField(
-        value = amount,
-        onValueChange = onAmountChange,
-        label = { Text(stringResource(R.string.amount), color = textColor) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = backgroundColor,
-            unfocusedContainerColor = backgroundColor,
-            focusedTextColor = textColor,
-            unfocusedTextColor = textColor,
-            focusedLabelColor = textColor,
-            unfocusedLabelColor = textColor,
-            focusedTrailingIconColor = textColor,
-            unfocusedTrailingIconColor = textColor
-        )
-    )
-}
-
 @Composable
 fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
     Button(
@@ -291,16 +190,6 @@ fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(stringResource(R.string.convert))
-    }
-}
-
-@Composable
-fun ResultDisplay(result: Double?, amount: String, baseCurrency: String, targetCurrency: String) {
-    result?.let {
-        Text(
-            text = "$amount $baseCurrency = ${"%.4f".format(it)} $targetCurrency",
-            style = MaterialTheme.typography.titleMedium
-        )
     }
 }
 
