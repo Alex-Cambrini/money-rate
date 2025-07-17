@@ -1,5 +1,6 @@
 package it.unibo.composeui.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -9,8 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,12 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-
 
 @Composable
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true)
@@ -33,7 +37,7 @@ fun CurrencyInputRowPreview() {
     CurrencyInputRow(
         currency = "EUR",
         onCurrencyChange = {},
-        androidx.compose.ui.text.input.TextFieldValue("100"),
+        amount = TextFieldValue("100"),
         onAmountChange = {},
         currencies = listOf("EUR" to "Euro", "USD" to "Dollar")
     )
@@ -54,19 +58,35 @@ fun CurrencyInputRow(
         modifier
             .fillMaxWidth()
             .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
-            .padding(
-                horizontal = 20.dp,
-                vertical = 10.dp
-            ),
+            .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        Box(modifier = Modifier
-            .weight(1f)
-            .clickable { expanded = true }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .clickable { expanded = true }
         ) {
-            Text(currency, style = MaterialTheme.typography.bodyLarge)
-            DropdownMenu(expanded, { expanded = false }) {
+            val rotation by animateFloatAsState(targetValue = if (expanded) 180f else 0f)
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = currency,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(start = 2.dp)
+                        .rotate(rotation)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
                 currencies.forEach { (code, name) ->
                     DropdownMenuItem(
                         text = { Text("$code – $name") },
@@ -85,8 +105,20 @@ fun CurrencyInputRow(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.End),
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f),
+            decorationBox = { innerTextField ->
+                Box {
+                    if (amount.text.isEmpty()) {
+                        Text(
+                            text = "e.g. 123.45",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        )
+                    }
+                    innerTextField()
+                }
+            }
         )
     }
 }
