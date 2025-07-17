@@ -37,7 +37,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -60,8 +59,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
     var targetCurrency by remember { mutableStateOf("USD") }
     var baseAmount by remember { mutableStateOf(TextFieldValue(amount)) }
     var targetAmount by remember { mutableStateOf(TextFieldValue("")) }
+    var lastInputSource by remember { mutableStateOf("base") }
 
-    val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
     var rotated by remember { mutableStateOf(false) }
@@ -75,7 +74,13 @@ fun HomeScreen(viewModel: HomeViewModel) {
         if (convertClicked && result != null) {
             val formatter = java.text.NumberFormat.getNumberInstance(java.util.Locale.ITALY)
             formatter.maximumFractionDigits = 4
-            targetAmount = TextFieldValue(formatter.format(result))
+
+            if (lastInputSource == "base") {
+                targetAmount = TextFieldValue(formatter.format(result))
+            } else {
+                baseAmount = TextFieldValue(formatter.format(result))
+            }
+
             convertClicked = false
         }
     }
@@ -112,23 +117,21 @@ fun HomeScreen(viewModel: HomeViewModel) {
                                 currency = baseCurrency,
                                 amount = baseAmount,
                                 onCurrencyChange = { baseCurrency = it },
-                                onAmountChange = { newTextValue ->
-                                    baseAmount = newTextValue
-                                    viewModel.updateAmount(newTextValue.text)
+                                onAmountChange = {
+                                    baseAmount = it
+                                    lastInputSource = "base"
+                                    viewModel.updateAmount(it.text)
                                 },
                                 currencies = availableCurrencies
                             )
 
-
                             CurrencyInputRow(
                                 currency = targetCurrency,
-                                onCurrencyChange = {
-                                    targetCurrency = it
-                                    focusManager.clearFocus(true)
-                                },
                                 amount = targetAmount,
+                                onCurrencyChange = { targetCurrency = it },
                                 onAmountChange = {
                                     targetAmount = it
+                                    lastInputSource = "target"
                                     viewModel.updateAmount(it.text)
                                 },
                                 currencies = availableCurrencies
@@ -163,10 +166,14 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         }
                     }
 
-                    ConvertButton(enabled = baseAmount.text.replace(',', '.').toDoubleOrNull() != null) {
-                        println("Convert clicked: baseAmount=$baseAmount, baseCurrency=$baseCurrency, targetCurrency=$targetCurrency")
+                    val inputText = if (lastInputSource == "base") baseAmount.text else targetAmount.text
+                    ConvertButton(enabled = inputText.replace(',', '.').toDoubleOrNull() != null) {
                         convertClicked = true
-                        viewModel.loadRate(baseCurrency, targetCurrency)
+                        if (lastInputSource == "base") {
+                            viewModel.loadRate(baseCurrency, targetCurrency)
+                        } else {
+                            viewModel.loadRate(targetCurrency, baseCurrency)
+                        }
                     }
                 }
             }
