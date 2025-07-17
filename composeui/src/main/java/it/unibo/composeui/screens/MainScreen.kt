@@ -42,38 +42,44 @@ fun MainScreen(homeViewModel: HomeViewModel, mainViewModel: MainViewModel) {
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = "home",
-                modifier = Modifier.fillMaxSize()
+        Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(Dimens.screenPadding)
+                    .fillMaxSize()
             ) {
-                composable("home") {
-                    HomeScreen(viewModel = homeViewModel)
-                }
-                composable("wallet") {
-                    val walletViewModel: WalletViewModel = viewModel(
-                        factory = WalletViewModelFactory(
-                            UseCaseProvider.addEntryUseCase,
-                            UseCaseProvider.removeEntryUseCase,
-                            UseCaseProvider.getAllEntriesUseCase,
-                            UseCaseProvider.getAvailableCurrenciesUseCase,
-                            UseCaseProvider.refreshCacheUseCase,
-                            UseCaseProvider.getCachedRatesUseCase,
-                            UseCaseProvider.updateWalletAmountUseCase
+                NavHost(
+                    navController = navController,
+                    startDestination = "home",
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    composable("home") {
+                        HomeScreen(viewModel = homeViewModel)
+                    }
+                    composable("wallet") {
+                        val walletViewModel: WalletViewModel = viewModel(
+                            factory = WalletViewModelFactory(
+                                UseCaseProvider.addEntryUseCase,
+                                UseCaseProvider.removeEntryUseCase,
+                                UseCaseProvider.getAllEntriesUseCase,
+                                UseCaseProvider.getAvailableCurrenciesUseCase,
+                                UseCaseProvider.refreshCacheUseCase,
+                                UseCaseProvider.getCachedRatesUseCase,
+                                UseCaseProvider.updateWalletAmountUseCase
+                            )
                         )
-                    )
-                    WalletScreen(viewModel = walletViewModel)
+                        WalletScreen(viewModel = walletViewModel)
+                    }
                 }
             }
 
             ConnectionStatusBanner(
                 viewModel = mainViewModel,
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .padding(top = innerPadding.calculateTopPadding())
             )
         }
     }
