@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -99,14 +100,22 @@ fun CurrencyInputRow(
             }
         }
 
+        val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+        val textColor = if (isDark) Color.White else Color.Black
+        val cursorColor = if (isDark) Color.White else Color.Black
+
         BasicTextField(
             value = amount,
             onValueChange = onAmountChange,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.End),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                textAlign = TextAlign.End,
+                color = textColor
+            ),
             modifier = Modifier.weight(1f),
-            decorationBox = { innerTextField ->
+            cursorBrush = SolidColor(cursorColor),
+                    decorationBox = { innerTextField ->
                 Box {
                     if (amount.text.isEmpty()) {
                         Text(
