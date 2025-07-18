@@ -76,7 +76,6 @@ fun SplashScreenWithError(onRetry: () -> Unit) {
 @Composable
 fun SplashScreenHost(
     splashViewModel: SplashViewModel,
-    homeViewModel: HomeViewModel,
     onNavigateToHome: () -> Unit
 ) {
     LaunchedEffect(Unit) {
@@ -89,9 +88,7 @@ fun SplashScreenHost(
         is SplashViewModel.State.Loading -> SplashScreen()
         is SplashViewModel.State.Error -> SplashScreenWithError(onRetry = { splashViewModel.initialize() })
         is SplashViewModel.State.Success -> {
-            val success = state as SplashViewModel.State.Success
             LaunchedEffect(Unit) {
-                homeViewModel.setInitialData(success.currencies, success.rates)
                 onNavigateToHome()
             }
         }

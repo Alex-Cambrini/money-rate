@@ -71,13 +71,4 @@ class HomeViewModel(
             _isLoadingRate.value = false
         }
     }
-
-
-    fun setInitialData(
-        currencies: List<Pair<String, String>>,
-        rates: Map<String, Double>
-    ) {
-        _currencies.value = currencies
-        _latestRates.value = rates
-    }
 }

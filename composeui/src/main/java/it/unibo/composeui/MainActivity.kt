@@ -67,7 +67,6 @@ fun AppEntryPoint() {
     } else {
         SplashScreenHost(
             splashViewModel = splashViewModel,
-            homeViewModel = homeViewModel,
             onNavigateToHome = { showMainScreen.value = true }
         )
     }
