@@ -2,6 +2,7 @@ package it.unibo.composeui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.unibo.composeui.R
 import it.unibo.composeui.components.CurrencyInputRow
 import it.unibo.composeui.theme.Dimens
+import it.unibo.composeui.theme.Surface
 import it.unibo.composeui.viewmodel.HomeViewModel
 
 @Composable
@@ -62,6 +64,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
     var baseAmount by remember { mutableStateOf(TextFieldValue(amount)) }
     var targetAmount by remember { mutableStateOf(TextFieldValue("")) }
     var lastInputSource by remember { mutableStateOf("base") }
+    val isLight = !isSystemInDarkTheme()
 
     val scrollState = rememberScrollState()
 
@@ -100,7 +103,9 @@ fun HomeScreen(viewModel: HomeViewModel) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = containerColor),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isLight) Surface else containerColor
+                ),
                 elevation = CardDefaults.cardElevation(1.dp)
             ) {
                 Column(
