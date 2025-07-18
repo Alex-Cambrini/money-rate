@@ -73,6 +73,9 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
     LaunchedEffect(Unit) {
         viewModel.loadInitialData()
+        viewModel.resetConversion()
+        baseAmount = TextFieldValue("")
+        targetAmount = TextFieldValue("")
     }
 
     LaunchedEffect(result) {
@@ -158,13 +161,19 @@ fun HomeScreen(viewModel: HomeViewModel) {
                                 baseCurrency = targetCurrency.also { targetCurrency = baseCurrency }
 
                                 val tempAmount = baseAmount
-                                baseAmount = TextFieldValue(targetAmount.text, TextRange(targetAmount.text.length))
-                                targetAmount = TextFieldValue(tempAmount.text, TextRange(tempAmount.text.length))
+                                baseAmount = TextFieldValue(
+                                    targetAmount.text,
+                                    TextRange(targetAmount.text.length)
+                                )
+                                targetAmount = TextFieldValue(
+                                    tempAmount.text,
+                                    TextRange(tempAmount.text.length)
+                                )
 
                                 viewModel.resetResult()
                                 viewModel.updateAmount(baseAmount.text)
                                 viewModel.loadRate(baseCurrency, targetCurrency)
-                            })  {
+                            }) {
                                 Icon(
                                     Icons.Filled.SwapVert,
                                     contentDescription = stringResource(R.string.swap_currencies),
@@ -174,9 +183,11 @@ fun HomeScreen(viewModel: HomeViewModel) {
                         }
                     }
 
-                    val inputText = if (lastInputSource == "base") baseAmount.text else targetAmount.text
+                    val inputText =
+                        if (lastInputSource == "base") baseAmount.text else targetAmount.text
                     ConvertButton(
-                        enabled = !isLoadingRate && inputText.replace(',', '.').toDoubleOrNull() != null
+                        enabled = !isLoadingRate && inputText.replace(',', '.')
+                            .toDoubleOrNull() != null
                     ) {
                         if (lastInputSource == "base") {
                             viewModel.loadRate(baseCurrency, targetCurrency)

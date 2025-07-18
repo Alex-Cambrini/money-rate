@@ -58,10 +58,14 @@ class HomeViewModel(
         _rate.value = null
     }
 
+    fun resetConversion() {
+        _amount.value = ""
+        resetResult()
+    }
+
     fun updateAmount(newAmount: String) {
         _amount.value = newAmount
     }
-
 
     fun loadRate(base: String = "EUR", to: String) {
         viewModelScope.launch(Dispatchers.IO) {
