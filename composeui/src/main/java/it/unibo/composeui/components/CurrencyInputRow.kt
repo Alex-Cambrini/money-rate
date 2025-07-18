@@ -123,13 +123,17 @@ fun CurrencyInputRow(
                 .weight(1f)
                 .onFocusChanged { focusState -> isFocused = focusState.isFocused },
             decorationBox = { innerTextField ->
-                Box {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterVertically),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
                     if (amount.text.isEmpty()) {
                         Text(
                             text = stringResource(R.string.amount_hint),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                            modifier = Modifier.align(Alignment.CenterEnd)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                         )
                     }
                     innerTextField()
