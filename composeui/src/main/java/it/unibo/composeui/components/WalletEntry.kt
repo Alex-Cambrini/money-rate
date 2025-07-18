@@ -1,5 +1,6 @@
 package it.unibo.composeui.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.unibo.composeui.R
+import it.unibo.composeui.theme.DarkSurface
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.domain.model.WalletEntry
@@ -36,10 +38,12 @@ fun WalletEntryCard(
     val euroValue = if (rates.isNotEmpty()) {
         viewModel.convertToEuro(entry, rates)
     } else 0.0
+    val isDark = isSystemInDarkTheme()
+    val cardColor = if (isDark) DarkSurface else MaterialTheme.colorScheme.surface
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
