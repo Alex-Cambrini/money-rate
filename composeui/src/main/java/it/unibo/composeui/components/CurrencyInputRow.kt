@@ -28,10 +28,12 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import it.unibo.composeui.R
 import it.unibo.composeui.theme.Primary
 
 
@@ -124,7 +126,7 @@ fun CurrencyInputRow(
                 Box {
                     if (amount.text.isEmpty()) {
                         Text(
-                            text = "e.g. 123.45",
+                            text = stringResource(R.string.amount_hint),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                             modifier = Modifier.align(Alignment.CenterEnd)
