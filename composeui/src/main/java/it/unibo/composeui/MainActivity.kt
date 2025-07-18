@@ -20,7 +20,10 @@ import it.unibo.composeui.viewmodel.SplashViewModelFactory
 import it.unibo.data.NetworkCheckerImpl
 import it.unibo.domain.di.UseCaseProvider
 import it.unibo.domain.usecase.InitializeAppDataUseCase
-
+import it.unibo.domain.usecase.home.CalculateConversionUseCase
+import it.unibo.domain.usecase.home.CalculateTopRatesUseCase
+import it.unibo.domain.usecase.home.GetSingleRateUseCase
+import it.unibo.domain.usecase.home.LoadHomeDataUseCase
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,14 @@ class MainActivity : ComponentActivity() {
 fun AppEntryPoint() {
     val context = LocalContext.current
 
+    val loadHomeDataUseCase = LoadHomeDataUseCase(
+        UseCaseProvider.getAvailableCurrenciesUseCase,
+        UseCaseProvider.getRateUseCase
+    )
+    val calculateTopRatesUseCase = CalculateTopRatesUseCase()
+    val calculateConversionUseCase = CalculateConversionUseCase()
+    val getSingleRateUseCase = GetSingleRateUseCase(UseCaseProvider.getRateUseCase)
+
     val initializeAppDataUseCase = InitializeAppDataUseCase(
         UseCaseProvider.getAvailableCurrenciesUseCase,
         UseCaseProvider.getRateUseCase
@@ -45,8 +56,10 @@ fun AppEntryPoint() {
 
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
-            UseCaseProvider.getRateUseCase,
-            UseCaseProvider.getAvailableCurrenciesUseCase
+            loadHomeDataUseCase,
+            calculateTopRatesUseCase,
+            calculateConversionUseCase,
+            getSingleRateUseCase
         )
     )
 
