@@ -60,6 +60,7 @@ import it.unibo.composeui.R
 import it.unibo.composeui.components.WalletEntryCard
 import it.unibo.composeui.theme.Background
 import it.unibo.composeui.theme.DarkBackground
+import it.unibo.composeui.theme.DarkSurface
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.domain.model.WalletEntry
@@ -88,6 +89,8 @@ fun WalletScreen(viewModel: WalletViewModel) {
     var showAddDialog by remember { mutableStateOf(false) }
     var editEntryId by remember { mutableStateOf<Int?>(null) }
     var deleteEntryId by remember { mutableStateOf<Int?>(null) }
+    val isDark = isSystemInDarkTheme()
+    val cardBackground = if (isDark) DarkSurface else MaterialTheme.colorScheme.surface
 
     LaunchedEffect(Unit) {
         println("DEBUG: WalletScreen LaunchedEffect(Unit) called.")
@@ -172,7 +175,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                        colors = CardDefaults.cardColors(containerColor = cardBackground),
                         elevation = CardDefaults.cardElevation(1.dp)
                     ) {
                         Row(
