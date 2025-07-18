@@ -25,12 +25,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import it.unibo.composeui.theme.Primary
+
 
 @Composable
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true)
@@ -102,7 +105,7 @@ fun CurrencyInputRow(
 
         val isDark = androidx.compose.foundation.isSystemInDarkTheme()
         val textColor = if (isDark) Color.White else Color.Black
-        val cursorColor = if (isDark) Color.White else Color.Black
+        var isFocused by remember { mutableStateOf(false) }
 
         BasicTextField(
             value = amount,
@@ -113,9 +116,11 @@ fun CurrencyInputRow(
                 textAlign = TextAlign.End,
                 color = textColor
             ),
-            modifier = Modifier.weight(1f),
-            cursorBrush = SolidColor(cursorColor),
-                    decorationBox = { innerTextField ->
+            cursorBrush = SolidColor(Primary),
+            modifier = Modifier
+                .weight(1f)
+                .onFocusChanged { focusState -> isFocused = focusState.isFocused },
+            decorationBox = { innerTextField ->
                 Box {
                     if (amount.text.isEmpty()) {
                         Text(
