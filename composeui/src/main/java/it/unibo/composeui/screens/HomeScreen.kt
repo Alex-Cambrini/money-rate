@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,8 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import it.unibo.composeui.R
 import it.unibo.composeui.components.CurrencyInputRow
+import it.unibo.composeui.theme.DarkSurface
 import it.unibo.composeui.theme.Dimens
-import it.unibo.composeui.theme.Surface
 import it.unibo.composeui.viewmodel.HomeViewModel
 
 @Composable
@@ -64,7 +63,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
     var baseAmount by remember { mutableStateOf(TextFieldValue(amount)) }
     var targetAmount by remember { mutableStateOf(TextFieldValue("")) }
     var lastInputSource by remember { mutableStateOf("base") }
-    val isLight = !isSystemInDarkTheme()
+    val cardBackground = if (isSystemInDarkTheme()) DarkSurface else MaterialTheme.colorScheme.surface
 
     val scrollState = rememberScrollState()
 
@@ -107,10 +106,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isLight) Surface else containerColor
+                    containerColor = cardBackground
                 ),
                 elevation = CardDefaults.cardElevation(1.dp)
-            ) {
+                ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
