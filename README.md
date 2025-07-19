@@ -49,7 +49,6 @@ Il progetto applica i principi della **Clean Architecture**, separando chiaramen
 - **WorkManager**: aggiornamento automatico dei tassi
 - **Material 3**: design system coerente con Android moderno
 
-
 ## 5. Comunicazione con API
 
 MoneyRate interroga il servizio Frankfurter API (https://api.frankfurter.app/) per ottenere:
@@ -70,11 +69,12 @@ L’app utilizza Room per la gestione del database locale, con tre entità:
 Questi dati vengono aggiornati e gestiti tramite Dao dedicati e repository implementati nel modulo
 data.
 
-
 ## 7. UI e UX
 
 L’interfaccia è sviluppata interamente in Jetpack Compose, con tre schermate principali.  
-Per migliorare la leggibilità e la riusabilità del codice UI, i componenti Composable riutilizzabili sono stati separati in una cartella components/, distinta da screens/ che contiene le schermate principali. Questa divisione favorisce la modularità dell’interfaccia e la manutenzione del codice.
+Per migliorare la leggibilità e la riusabilità del codice UI, i componenti Composable riutilizzabili
+sono stati separati in una cartella components/, distinta da screens/ che contiene le schermate
+principali. Questa divisione favorisce la modularità dell’interfaccia e la manutenzione del codice.
 
 - SplashScreen: animazione iniziale e caricamento dati
 - HomeScreen: conversione valuta e grafici dei tassi
@@ -83,13 +83,14 @@ Per migliorare la leggibilità e la riusabilità del codice UI, i componenti Com
 ### Esperienza utente
 
 - Supporto automatico a tema scuro/chiaro
-- Input numerico flessibile: supporto sia a punto che virgola come separatore decimale, per un'esperienza utente naturale
+- Input numerico flessibile: supporto sia a punto che virgola come separatore decimale, per
+  un'esperienza utente naturale
 - Layout responsive e animazioni coerenti con le linee guida Material 3
-
 
 ## 8. Gestione aggiornamenti: WorkManager
 
-L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **WorkManager**, con vincoli di rete attiva (`NetworkType.CONNECTED`).
+L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **WorkManager**, con
+vincoli di rete attiva (`NetworkType.CONNECTED`).
 
 ### Comportamento
 
@@ -99,7 +100,6 @@ L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **Wo
 - I dati sono salvati in cache locale per permettere l’uso offline
 - I tassi vengono aggiornati anche all’apertura dell’app per maggiore affidabilità
 
-
 ## 9. Punti di forza
 
 - Architettura solida, modulare e facilmente estendibile
@@ -108,28 +108,31 @@ L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **Wo
 - Codice leggibile e ben separato in livelli
 - Utilizzo corretto di coroutine per operazioni asincrone
 
-
 ## 10. Problematiche riscontrate
 
 ### Limitazioni WorkManager
 
-- Su alcuni dispositivi, l’esecuzione periodica fallisce perché il sistema disattiva la connessione internet (modalità **Doze**, ottimizzazione batteria).
+- Su alcuni dispositivi, l’esecuzione periodica fallisce perché il sistema disattiva la connessione
+  internet (modalità **Doze**, ottimizzazione batteria).
 
-- **Soluzione scartata**: disabilitare l’ottimizzazione batteria via codice (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`).  
+- **Soluzione scartata**: disabilitare l’ottimizzazione batteria via codice (
+  `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`).  
   Sebbene efficace, è una misura invasiva e rischiosa per la pubblicazione sul Play Store.
 
-- **Soluzione adottata**: configurare WorkManager con vincolo `NetworkType.CONNECTED` e backoff esponenziale; aggiornare i tassi anche all’avvio dell'app per garantire un refresh sicuro.  
+- **Soluzione adottata**: configurare WorkManager con vincolo `NetworkType.CONNECTED` e backoff
+  esponenziale; aggiornare i tassi anche all’avvio dell'app per garantire un refresh sicuro.  
   Questa strategia è conforme alle policy di sistema.
-
 
 ### Gestione localizzazione numerica
 
-- I tassi dalle API usano il punto (`.`) come separatore decimale, mentre l’utente italiano si aspetta la virgola (`,`).
-- Il `ViewModel` normalizza l’input con `replace(',', '.')` per accettare entrambi i formati (es. `1.5` e `1,5`)
-- La `HomeScreen` formatta l’output con `NumberFormat(Locale.ITALY)` per mostrare i valori nel formato atteso (es. `1,2345`)
+- I tassi dalle API usano il punto (`.`) come separatore decimale, mentre l’utente italiano si
+  aspetta la virgola (`,`).
+- Il `ViewModel` normalizza l’input con `replace(',', '.')` per accettare entrambi i formati (es.
+  `1.5` e `1,5`)
+- La `HomeScreen` formatta l’output con `NumberFormat(Locale.ITALY)` per mostrare i valori nel
+  formato atteso (es. `1,2345`)
 
-> Questo garantisce compatibilità input/output e coerenza nell’interfaccia.
-
+Questo garantisce compatibilità input/output e coerenza nell’interfaccia.
 
 ## 11. Estensioni future
 
@@ -141,7 +144,6 @@ Funzionalità utili da considerare per un'evoluzione futura dell'app:
 - Autenticazione utente (es. login con Google/Firebase)
 - Sincronizzazione cloud del wallet
 
-
 ## 12. Dettagli del team
 
 Il progetto è stato realizzato da:
@@ -151,10 +153,13 @@ Il progetto è stato realizzato da:
 
 ## 13. Conclusioni
 
-**MoneyRate** è un’app Android completa e moderna, pensata per offrire un’esperienza utente fluida e una struttura tecnica robusta.  
-L'utilizzo di **Jetpack Compose**, **WorkManager**, e una **Clean Architecture modulare** ha garantito una buona manutenibilità e chiarezza del codice.
+**MoneyRate** è un’app Android completa e moderna, pensata per offrire un’esperienza utente fluida e
+una struttura tecnica robusta.  
+L'utilizzo di **Jetpack Compose**, **WorkManager**, e una **Clean Architecture modulare** ha
+garantito una buona manutenibilità e chiarezza del codice.
 
-La separazione dei livelli ha favorito una collaborazione efficiente e un'app pronta per eventuali estensioni o pubblicazione.
+La separazione dei livelli ha favorito una collaborazione efficiente e un'app pronta per eventuali
+estensioni o pubblicazione.
 
 ## 14. Riferimenti
 
