@@ -126,6 +126,14 @@ class WalletViewModel(
         }
     }
 
+    fun parseAmount(input: String): Double? {
+        return input.replace(',', '.').toDoubleOrNull()
+    }
+
+    fun parseDelta(input: String): Double? {
+        return input.replace(',', '.').toDoubleOrNull()
+    }
+
     fun clearError() {
         _errorMessage.value = null
     }

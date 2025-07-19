@@ -217,6 +217,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
 
     if (showAddDialog) {
         AddWalletDialog(
+            viewModel = viewModel,
             availableCurrencies = currencies.filter { (code, _) ->
                 entries.none { it.currencyCode == code }
             },
@@ -234,6 +235,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
 
     if (entryToEdit != null) {
         EditWalletDialog(
+            viewModel = viewModel,
             errorMessage = errorMessage,
             onDismiss = {
                 viewModel.clearError()
@@ -267,6 +269,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
 
 @Composable
 fun AddWalletDialog(
+    viewModel: WalletViewModel,
     availableCurrencies: List<Pair<String, String>>,
     onDismiss: () -> Unit,
     onConfirm: (String, Double) -> Unit
@@ -295,9 +298,9 @@ fun AddWalletDialog(
                 TextField(
                     value = amountText,
                     onValueChange = {
-                        if (it.all { ch -> ch.isDigit() || ch == '.' }) amountText = it
+                        if (it.all { ch -> ch.isDigit() || ch == '.' || ch == ',' }) amountText = it
                     },
-                    label = { Text(stringResource(R.string.amount), color = textColor) },
+                            label = { Text(stringResource(R.string.amount), color = textColor) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
@@ -313,7 +316,7 @@ fun AddWalletDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                val amount = amountText.toDoubleOrNull()
+                val amount = viewModel.parseAmount(amountText)
                 if (amount != null && selectedCurrency.isNotBlank()) {
                     onConfirm(selectedCurrency, amount)
                 }
@@ -332,6 +335,7 @@ fun AddWalletDialog(
 
 @Composable
 fun EditWalletDialog(
+    viewModel: WalletViewModel,
     errorMessage: String?,
     onDismiss: () -> Unit,
     onConfirm: (Double) -> Unit
@@ -351,9 +355,9 @@ fun EditWalletDialog(
                 TextField(
                     value = amountText,
                     onValueChange = {
-                        if (it.all { ch -> ch.isDigit() || ch == '.' || ch == '-' }) amountText = it
+                        if (it.all { ch -> ch.isDigit() || ch == '.' || ch == ',' || ch == '-' }) amountText = it
                     },
-                    label = { Text(stringResource(R.string.delta), color = textColor) },
+                            label = { Text(stringResource(R.string.delta), color = textColor) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
@@ -376,7 +380,7 @@ fun EditWalletDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                val delta = amountText.toDoubleOrNull()
+                val delta = viewModel.parseDelta(amountText)
                 if (delta != null) {
                     onConfirm(delta)
                 }
