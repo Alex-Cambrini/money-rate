@@ -63,7 +63,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
     var baseAmount by remember { mutableStateOf(TextFieldValue(amount)) }
     var targetAmount by remember { mutableStateOf(TextFieldValue("")) }
     var lastInputSource by remember { mutableStateOf("base") }
-    val cardBackground = if (isSystemInDarkTheme()) DarkSurface else MaterialTheme.colorScheme.surface
+    val cardBackground =
+        if (isSystemInDarkTheme()) DarkSurface else MaterialTheme.colorScheme.surface
 
     val scrollState = rememberScrollState()
 
@@ -109,7 +110,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     containerColor = cardBackground
                 ),
                 elevation = CardDefaults.cardElevation(1.dp)
-                ) {
+            ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)

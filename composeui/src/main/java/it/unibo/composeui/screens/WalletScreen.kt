@@ -300,7 +300,7 @@ fun AddWalletDialog(
                     onValueChange = {
                         if (it.all { ch -> ch.isDigit() || ch == '.' || ch == ',' }) amountText = it
                     },
-                            label = { Text(stringResource(R.string.amount), color = textColor) },
+                    label = { Text(stringResource(R.string.amount), color = textColor) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
@@ -355,9 +355,10 @@ fun EditWalletDialog(
                 TextField(
                     value = amountText,
                     onValueChange = {
-                        if (it.all { ch -> ch.isDigit() || ch == '.' || ch == ',' || ch == '-' }) amountText = it
+                        if (it.all { ch -> ch.isDigit() || ch == '.' || ch == ',' || ch == '-' }) amountText =
+                            it
                     },
-                            label = { Text(stringResource(R.string.delta), color = textColor) },
+                    label = { Text(stringResource(R.string.delta), color = textColor) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(

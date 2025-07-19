@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import it.unibo.composeui.R
 import it.unibo.composeui.theme.Dimens
-import it.unibo.composeui.viewmodel.HomeViewModel
 import it.unibo.composeui.viewmodel.SplashViewModel
 
 @Composable
