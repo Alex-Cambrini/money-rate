@@ -4,7 +4,7 @@
 
 MoneyRate è un’app Android pensata per una conversione valutaria in tempo reale e la gestione di un
 portafoglio virtuale multivaluta.
-Si rivolge a utenti che vogliono convertire rapidamente valute e gestire un portafoglio simulato.
+Si rivolge a utenti che vogliono convertire rapidamente valute e gestire un portafoglio.
 
 Sviluppata come progetto accademico, non prevede autenticazione né pubblicazione. L’interfaccia è in
 inglese.
@@ -19,11 +19,17 @@ inglese.
 
 ## 3. Architettura e struttura del progetto
 
-Il progetto applica i principi della Clean Architecture, separando chiaramente:
+Il progetto applica i principi della **Clean Architecture**, separando chiaramente:
 
 - logica di dominio (modelli, use case, repository astratti)
 - logica dati/API (implementazioni repository, Retrofit, Room)
 - interfaccia utente (Jetpack Compose, ViewModel, Navigation)
+
+### Approccio architetturale
+
+- **MVVM (Model-View-ViewModel)**: per la gestione della logica di presentazione
+- **Clean Architecture**: per una separazione netta delle responsabilità
+- **Dependency Injection manuale**: tramite `UseCaseProvider` e `RepositoryProviderImpl`
 
 ### Struttura modulare
 
@@ -43,14 +49,17 @@ Il progetto applica i principi della Clean Architecture, separando chiaramente:
 - **WorkManager**: aggiornamento automatico dei tassi
 - **Material 3**: design system coerente con Android moderno
 
-### Architettura
 
-- **MVVM (Model-View-ViewModel)**: per la gestione della logica di presentazione
-- **Clean Architecture**: per una separazione netta delle responsabilità
-- **Dependency Injection manuale**: tramite `UseCaseProvider` e `RepositoryProviderImpl`
+## 5. Comunicazione con API
 
+MoneyRate interroga il servizio Frankfurter API (https://api.frankfurter.app/) per ottenere:
 
-## 5. Persistenza dati
+- la lista delle valute disponibili
+- i tassi di cambio aggiornati tra valute
+
+La comunicazione avviene tramite Retrofit con parser JSON Moshi.
+
+## 6. Persistenza dati
 
 L’app utilizza Room per la gestione del database locale, con tre entità:
 
@@ -61,39 +70,33 @@ L’app utilizza Room per la gestione del database locale, con tre entità:
 Questi dati vengono aggiornati e gestiti tramite Dao dedicati e repository implementati nel modulo
 data.
 
-## 6. Comunicazione con API
-
-MoneyRate interroga il servizio Frankfurter API (https://api.frankfurter.app/) per ottenere:
-
-- la lista delle valute disponibili
-- i tassi di cambio aggiornati tra valute
-
-La comunicazione avviene tramite Retrofit con parser JSON Moshi.
 
 ## 7. UI e UX
 
-L’interfaccia è sviluppata interamente in **Jetpack Compose**, con tre schermate principali:
+L’interfaccia è sviluppata interamente in Jetpack Compose, con tre schermate principali.  
+Per migliorare la leggibilità e la riusabilità del codice UI, i componenti Composable riutilizzabili sono stati separati in una cartella components/, distinta da screens/ che contiene le schermate principali. Questa divisione favorisce la modularità dell’interfaccia e la manutenzione del codice.
 
-- **SplashScreen**: animazione iniziale e caricamento dati
-- **HomeScreen**: conversione valuta e grafici dei tassi
-- **WalletScreen**: gestione visiva del portafoglio
+- SplashScreen: animazione iniziale e caricamento dati
+- HomeScreen: conversione valuta e grafici dei tassi
+- WalletScreen: gestione visiva del portafoglio
 
 ### Esperienza utente
 
 - Supporto automatico a tema scuro/chiaro
-- Uso di `NumberFormat(Locale.ITALY)` per formattare correttamente i numeri e accettare input con punto o virgola (es. `1.5` o `1,5`)
+- Input numerico flessibile: supporto sia a punto che virgola come separatore decimale, per un'esperienza utente naturale
 - Layout responsive e animazioni coerenti con le linee guida Material 3
 
 
-## 8. Aggiornamento tassi con WorkManager
+## 8. Gestione aggiornamenti: WorkManager
 
-L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **WorkManager** con vincoli di rete attiva (`NetworkType.CONNECTED`).
+L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **WorkManager**, con vincoli di rete attiva (`NetworkType.CONNECTED`).
 
-### Comportamento:
+### Comportamento
 
 - All’avvio, viene schedulato un `PeriodicWorkRequest` con `ExistingPeriodicWorkPolicy.KEEP`
+- L’aggiornamento richiede una connessione di rete attiva
 - È prevista una **backoff policy esponenziale** in caso di errore
-- I dati sono salvati in locale per permettere l’uso offline
+- I dati sono salvati in cache locale per permettere l’uso offline
 - I tassi vengono aggiornati anche all’apertura dell’app per maggiore affidabilità
 
 
@@ -105,13 +108,27 @@ L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **Wo
 - Codice leggibile e ben separato in livelli
 - Utilizzo corretto di coroutine per operazioni asincrone
 
----
 
 ## 10. Problematiche riscontrate
 
-- In alcuni dispositivi, i job pianificati non vengono eseguiti a causa della **modalità Doze** o delle **ottimizzazioni energetiche**
-- Soluzione scartata: richiesta di disattivazione dell’ottimizzazione batteria (non compatibile con Play Store)
-- Soluzione adottata: aggiornamento anche all’avvio e configurazione conservativa del worker
+### Limitazioni WorkManager
+
+- Su alcuni dispositivi, l’esecuzione periodica fallisce perché il sistema disattiva la connessione internet (modalità **Doze**, ottimizzazione batteria).
+
+- **Soluzione scartata**: disabilitare l’ottimizzazione batteria via codice (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`).  
+  Sebbene efficace, è una misura invasiva e rischiosa per la pubblicazione sul Play Store.
+
+- **Soluzione adottata**: configurare WorkManager con vincolo `NetworkType.CONNECTED` e backoff esponenziale; aggiornare i tassi anche all’avvio dell'app per garantire un refresh sicuro.  
+  Questa strategia è conforme alle policy di sistema.
+
+
+### Gestione localizzazione numerica
+
+- I tassi dalle API usano il punto (`.`) come separatore decimale, mentre l’utente italiano si aspetta la virgola (`,`).
+- Il `ViewModel` normalizza l’input con `replace(',', '.')` per accettare entrambi i formati (es. `1.5` e `1,5`)
+- La `HomeScreen` formatta l’output con `NumberFormat(Locale.ITALY)` per mostrare i valori nel formato atteso (es. `1,2345`)
+
+> Questo garantisce compatibilità input/output e coerenza nell’interfaccia.
 
 
 ## 11. Estensioni future
