@@ -20,6 +20,10 @@ class CustomApplication : Application(), Configuration.Provider {
 
     private val repositoryProvider by lazy { RepositoryProviderImpl(this) }
 
+    companion object {
+        private const val UPDATE_INTERVAL_MINUTES = 15L
+    }
+
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(
@@ -36,7 +40,10 @@ class CustomApplication : Application(), Configuration.Provider {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val workRequest = PeriodicWorkRequestBuilder<CurrencyUpdateWorker>(15, TimeUnit.MINUTES)
+        val workRequest = PeriodicWorkRequestBuilder<CurrencyUpdateWorker>(
+            UPDATE_INTERVAL_MINUTES,
+            TimeUnit.MINUTES
+        )
             .setConstraints(constraints)
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
