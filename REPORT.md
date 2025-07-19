@@ -25,31 +25,30 @@ Il progetto applica i principi della Clean Architecture, separando chiaramente:
 - logica dati/API (implementazioni repository, Retrofit, Room)
 - interfaccia utente (Jetpack Compose, ViewModel, Navigation)
 
-La struttura modulare è suddivisa in quattro moduli principali:
+### Struttura modulare
 
-**Moduli principali:**
+- `app/`: entry point dell’applicazione, configurazione generale
+- `composeui/`: schermate, componenti UI, temi e navigazione
+- `data/`: persistenza locale e API remote
+- `domain/`: logica di business e astrazioni
 
-- `app/`: CustomApplication, WorkManager, WorkerFactory
-- `composeui/`: schermate, ViewModel, temi, navigation, components
-- `data/`: implementazioni repository, chiamate API, database Room
-- `domain/`: modelli, repository astratti, casi d’uso
+## 4. Componenti chiave
 
-## 4. Componenti chiave utilizzati
+### Tecnologie e librerie utilizzate
 
-**Librerie e tecnologie:**
+- **Jetpack Compose**: interfaccia utente moderna e reattiva
+- **Room**: persistenza locale dei dati
+- **Retrofit + Moshi**: comunicazione con le API di cambio valuta
+- **StateFlow + ViewModel**: gestione dello stato e del ciclo di vita
+- **WorkManager**: aggiornamento automatico dei tassi
+- **Material 3**: design system coerente con Android moderno
 
-- Jetpack Compose – interfaccia utente reattiva
-- Room – persistenza locale dei dati del wallet
-- Retrofit + Moshi – comunicazione con API Frankfurter
-- WorkManager – aggiornamento automatico dei tassi
-- StateFlow + ViewModel – gestione stato e ciclo vita
-- Material 3 – stile coerente e moderno
+### Architettura
 
-**Architettura:**
+- **MVVM (Model-View-ViewModel)**: per la gestione della logica di presentazione
+- **Clean Architecture**: per una separazione netta delle responsabilità
+- **Dependency Injection manuale**: tramite `UseCaseProvider` e `RepositoryProviderImpl`
 
-- MVVM (Model-View-ViewModel)
-- Clean Architecture (UseCase + Repository pattern)
-- Dependency Injection manuale (UseCaseProvider, RepositoryProviderImpl)
 
 ## 5. Persistenza dati
 
@@ -73,66 +72,58 @@ La comunicazione avviene tramite Retrofit con parser JSON Moshi.
 
 ## 7. UI e UX
 
-L’interfaccia è realizzata interamente in Jetpack Compose, con tre schermate principali:
+L’interfaccia è sviluppata interamente in **Jetpack Compose**, con tre schermate principali:
 
-- SplashScreen: schermata iniziale con animazione e caricamento dei dati
-- HomeScreen: conversione valuta e visualizzazione grafica dei tassi di cambio
-- WalletScreen: gestione del portafoglio con rappresentazione visiva della composizione
+- **SplashScreen**: animazione iniziale e caricamento dati
+- **HomeScreen**: conversione valuta e grafici dei tassi
+- **WalletScreen**: gestione visiva del portafoglio
 
-L’interfaccia supporta automaticamente il tema scuro e chiaro, adattandosi alle preferenze del
-sistema operativo per un’esperienza visiva coerente e confortevole.
+### Esperienza utente
 
-## 8. Gestione aggiornamenti: WorkManager
+- Supporto automatico a tema scuro/chiaro
+- Uso di `NumberFormat(Locale.ITALY)` per formattare correttamente i numeri e accettare input con punto o virgola (es. `1.5` o `1,5`)
+- Layout responsive e animazioni coerenti con le linee guida Material 3
 
-- All’avvio, l’app configura UseCaseProvider e schedula un aggiornamento periodico dei tassi ogni 15
-  minuti con WorkManager.
-- L’aggiornamento richiede una connessione di rete (NetworkType.CONNECTED) e usa una policy di
-  backoff esponenziale in caso di errore.
-- I tassi aggiornati vengono salvati in cache locale per garantire l’uso offline.
-- Se il lavoro è già schedulato, non viene duplicato (ExistingPeriodicWorkPolicy.KEEP).
+
+## 8. Aggiornamento tassi con WorkManager
+
+L’app aggiorna periodicamente i tassi di cambio ogni **15 minuti** usando **WorkManager** con vincoli di rete attiva (`NetworkType.CONNECTED`).
+
+### Comportamento:
+
+- All’avvio, viene schedulato un `PeriodicWorkRequest` con `ExistingPeriodicWorkPolicy.KEEP`
+- È prevista una **backoff policy esponenziale** in caso di errore
+- I dati sono salvati in locale per permettere l’uso offline
+- I tassi vengono aggiornati anche all’apertura dell’app per maggiore affidabilità
+
 
 ## 9. Punti di forza
 
-- Architettura pulita, facilmente estendibile
-- UI moderna e reattiva
-- Grafici interattivi ben integrati
-- Aggiornamento automatico dati via WorkManager
-- Codice modulare e leggibile
-- Uso corretto di coroutine per operazioni asincrone, evitando blocchi sulla main thread
+- Architettura solida, modulare e facilmente estendibile
+- UI moderna con grafici ben integrati
+- Aggiornamenti automatici dei dati ottimizzati per il ciclo di vita del sistema
+- Codice leggibile e ben separato in livelli
+- Utilizzo corretto di coroutine per operazioni asincrone
+
+---
 
 ## 10. Problematiche riscontrate
 
-### Limitazioni WorkManager
+- In alcuni dispositivi, i job pianificati non vengono eseguiti a causa della **modalità Doze** o delle **ottimizzazioni energetiche**
+- Soluzione scartata: richiesta di disattivazione dell’ottimizzazione batteria (non compatibile con Play Store)
+- Soluzione adottata: aggiornamento anche all’avvio e configurazione conservativa del worker
 
-- Su alcuni dispositivi, l’esecuzione periodica fallisce perché il sistema disattiva la connessione
-  internet (modalità Doze, ottimizzazione batteria).
-- Soluzione scartata: disabilitare l’ottimizzazione batteria via codice (
-  `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`), efficace ma invasiva e rischiosa per la pubblicazione sul
-  Play Store.
-- Soluzione adottata: configurare WorkManager con vincolo `NetworkType.CONNECTED` e backoff
-  esponenziale; aggiornare i tassi anche all’avvio dell’app per garantire un refresh sicuro.
-  Strategia conforme alle policy di sistema.
 
-### Gestione localizzazione numerica
+## 11. Estensioni future
 
-- I tassi dalle API usano il punto (`.`) come separatore decimale, mentre l’utente italiano si
-  aspetta la virgola (`,`).
-- Il **ViewModel** normalizza l’input con `replace(',', '.')` per accettare entrambi i formati (es.
-  `1.5` e `1,5`).
-- La **HomeScreen** formatta l’output con `NumberFormat(Locale.ITALY)` per mostrare i valori nel
-  formato atteso (es. `1,2345`).
+Funzionalità utili da considerare per un'evoluzione futura dell'app:
 
-Questo garantisce compatibilità input/output e coerenza nell’interfaccia.
+- Cronologia delle conversioni
+- Grafici temporali con andamento dei tassi
+- Notifiche su soglie personalizzate
+- Autenticazione utente (es. login con Google/Firebase)
+- Sincronizzazione cloud del wallet
 
-## 11. Possibili estensioni future
-
-Sebbene il progetto sia stato completato con tutte le funzionalità previste, alcune estensioni utili
-potrebbero essere:
-
-- Aggiunta di cronologia delle conversioni
-- Supporto per grafici temporali (trend dei tassi)
-- Aggiunta di notifiche quando una valuta raggiunge una soglia
-- Integrazione con Firebase o autenticazione Google
 
 ## 12. Dettagli del team
 
@@ -143,13 +134,10 @@ Il progetto è stato realizzato da:
 
 ## 13. Conclusioni
 
-MoneyRate è un’app Android completa e moderna. L’utilizzo di Compose, WorkManager e un’architettura
-modulare ha permesso di ottenere una struttura chiara, facilmente manutenibile e pronta per essere
-eventualmente estesa con nuove funzionalità.
+**MoneyRate** è un’app Android completa e moderna, pensata per offrire un’esperienza utente fluida e una struttura tecnica robusta.  
+L'utilizzo di **Jetpack Compose**, **WorkManager**, e una **Clean Architecture modulare** ha garantito una buona manutenibilità e chiarezza del codice.
 
-La separazione tra livelli domain, data e ui ha favorito una divisione del lavoro efficiente
-all’interno del team, con una buona copertura delle problematiche comuni in fase di sviluppo mobile
-moderno.
+La separazione dei livelli ha favorito una collaborazione efficiente e un'app pronta per eventuali estensioni o pubblicazione.
 
 ## 14. Riferimenti
 
