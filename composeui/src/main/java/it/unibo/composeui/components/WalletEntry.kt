@@ -26,6 +26,7 @@ import it.unibo.composeui.theme.DarkSurface
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.domain.model.WalletEntry
+import java.util.Locale
 
 @Composable
 fun WalletEntryCard(
@@ -64,8 +65,14 @@ fun WalletEntryCard(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.End
             ) {
-                Text("%.2f".format(entry.amount), style = MaterialTheme.typography.bodyMedium)
-                Text("%.2f€".format(euroValue), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    String.format(Locale.ITALY, "%.2f", entry.amount),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    String.format(Locale.ITALY, "%.2f€", euroValue),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
             Column(
                 modifier = Modifier.weight(1f),

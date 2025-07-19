@@ -64,6 +64,7 @@ import it.unibo.composeui.theme.DarkSurface
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.domain.model.WalletEntry
+import java.util.Locale
 
 @Composable
 fun WalletScreen(viewModel: WalletViewModel) {
@@ -120,7 +121,11 @@ fun WalletScreen(viewModel: WalletViewModel) {
         ) {
             item {
                 Text(
-                    text = stringResource(R.string.total_value_format).format(total),
+                    text = String.format(
+                        Locale.ITALY,
+                        stringResource(R.string.total_value_format),
+                        total
+                    ),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -162,7 +167,15 @@ fun WalletScreen(viewModel: WalletViewModel) {
                                             )
                                     )
                                     Spacer(modifier = Modifier.width(Dimens.elementSpacing))
-                                    Text("${item.currencyCode}: %.2f".format(item.amount))
+                                    Text(
+                                        "${item.currencyCode}: ${
+                                            String.format(
+                                                Locale.ITALY,
+                                                "%.2f",
+                                                item.amount
+                                            )
+                                        }"
+                                    )
                                 }
                             }
                         }
@@ -526,7 +539,13 @@ fun WalletDonutChart(
         selectedIndex?.let { i ->
             val entry = entries[i]
             Text(
-                text = "${entry.currencyCode}: ${"%.2f".format(entry.amount)}",
+                text = "${entry.currencyCode}: ${
+                    String.format(
+                        Locale.ITALY,
+                        "%.2f",
+                        entry.amount
+                    )
+                }",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )

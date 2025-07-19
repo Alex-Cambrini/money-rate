@@ -49,6 +49,7 @@ import it.unibo.composeui.components.CurrencyInputRow
 import it.unibo.composeui.theme.DarkSurface
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
+import java.util.Locale
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
@@ -80,7 +81,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
     LaunchedEffect(result) {
         if (result != null) {
-            val formatter = java.text.NumberFormat.getNumberInstance(java.util.Locale.ITALY)
+            val formatter = java.text.NumberFormat.getNumberInstance(Locale.ITALY)
             formatter.maximumFractionDigits = 4
             if (lastInputSource == "base") {
                 targetAmount = TextFieldValue(formatter.format(result))
