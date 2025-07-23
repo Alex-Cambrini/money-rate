@@ -228,6 +228,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
         }
     }
 
+    // Apertura dialog di aggiunta wallet
     if (showAddDialog) {
         AddWalletDialog(
             viewModel = viewModel,
@@ -242,6 +243,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
         )
     }
 
+    // Gestione dialog di modifica wallet
     var triedSave by remember { mutableStateOf(false) }
     val errorMessage by viewModel.errorMessage.collectAsState()
     val entryToEdit = entries.find { it.id == editEntryId }
@@ -268,6 +270,7 @@ fun WalletScreen(viewModel: WalletViewModel) {
         editEntryId = null
     }
 
+    // Gestione dialog di conferma eliminazione
     val entryToDelete = entries.find { it.id == deleteEntryId }
     if (entryToDelete != null) {
         ConfirmDeleteDialog(
@@ -287,9 +290,11 @@ fun AddWalletDialog(
     onDismiss: () -> Unit,
     onConfirm: (String, Double) -> Unit
 ) {
+    // Valuta selezionata inizialmente (prima disponibile oppure stringa vuota)
     var selectedCurrency by remember { mutableStateOf(availableCurrencies.firstOrNull()?.first.orEmpty()) }
     var amountText by remember { mutableStateOf("") }
 
+    // Colori adattivi in base al tema
     val isDark = isSystemInDarkTheme()
     val backgroundColor = if (isDark) DarkBackground else Background
     val textColor =
@@ -300,14 +305,16 @@ fun AddWalletDialog(
         title = { Text(stringResource(R.string.add_wallet), color = textColor) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)) {
+                // Selettore a tendina delle valute
                 DropdownMenuCurrencySelector(
                     currencies = availableCurrencies.map { "${it.first} - ${it.second}" },
                     selected = availableCurrencies.find { it.first == selectedCurrency }
                         ?.let { "${it.first} - ${it.second}" } ?: "",
                     onSelected = { selectedString ->
-                        selectedCurrency = selectedString.substringBefore(" - ")
+                        selectedCurrency = selectedString.substringBefore(" -")
                     }
                 )
+                // Campo di inserimento per l'importo (filtra solo numeri, punti, virgole)
                 TextField(
                     value = amountText,
                     onValueChange = {
@@ -365,6 +372,7 @@ fun EditWalletDialog(
         title = { Text(stringResource(R.string.edit_amount), color = textColor) },
         text = {
             Column {
+                // Campo input per il delta (può anche essere negativo)
                 TextField(
                     value = amountText,
                     onValueChange = {
@@ -383,6 +391,7 @@ fun EditWalletDialog(
                         unfocusedLabelColor = textColor
                     )
                 )
+                // Mostra errore, se presente
                 if (errorMessage != null) {
                     Spacer(modifier = Modifier.height(Dimens.elementSpacing))
                     Text(
@@ -442,7 +451,7 @@ fun ConfirmDeleteDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuCurrencySelector(
-    currencies: List<String>,
+    currencies: List<String>, // Formato: "EUR - Euro"
     selected: String,
     onSelected: (String) -> Unit
 ) {
@@ -457,6 +466,7 @@ fun DropdownMenuCurrencySelector(
         expanded = expanded,
         onExpandedChange = { expanded = it }
     ) {
+        // Campo visibile, non modificabile manualmente
         TextField(
             value = selected,
             onValueChange = {},
@@ -481,6 +491,7 @@ fun DropdownMenuCurrencySelector(
             )
         )
 
+        // Menu a tendina con tutte le valute disponibili
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
@@ -507,7 +518,7 @@ fun WalletDonutChart(
     thickness: Dp = Dimens.donutChartThickness
 ) {
     val total = entries.sumOf { it.amount }
-    if (total == 0.0) return
+    if (total == 0.0) return // Niente da mostrare se il portafoglio è vuoto
 
     val colors = listOf(
         MaterialTheme.colorScheme.primary,
@@ -521,6 +532,7 @@ fun WalletDonutChart(
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
     Box(contentAlignment = Alignment.Center) {
+        // Disegna la ciambella con segmenti colorati proporzionali agli importi
         Canvas(modifier = modifier.size(size)) {
             var startAngle = -90f
             entries.forEachIndexed { index, entry ->
@@ -536,6 +548,7 @@ fun WalletDonutChart(
             }
         }
 
+        // Mostra testo con valore e valuta selezionata
         selectedIndex?.let { i ->
             val entry = entries[i]
             Text(
@@ -551,6 +564,8 @@ fun WalletDonutChart(
             )
         }
     }
+
+    // Reset selezione quando cambia la lista
     LaunchedEffect(entries) {
         selectedIndex = null
     }
