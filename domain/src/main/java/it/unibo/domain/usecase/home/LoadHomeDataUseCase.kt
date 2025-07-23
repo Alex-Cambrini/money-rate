@@ -13,11 +13,17 @@ class LoadHomeDataUseCase(
         val rates: Map<String, Double>
     )
 
+    /**
+     * Carica valute disponibili e i loro tassi rispetto a EUR.
+     * @return Result con Data se successo, altrimenti failure con eccezione
+     */
     suspend operator fun invoke(): Result<Data> {
         return try {
+            // Ottiene le valute disponibili
             val currenciesDomain = getAvailableCurrenciesUseCase.invoke()
             val currencies = currenciesDomain.map { it.code to it.name }
 
+            // Ottiene i tassi EUR->valuta, esclude EUR e tassi zero
             val rates = currencies
                 .mapNotNull { (code, _) ->
                     if (code != "EUR") {
@@ -26,6 +32,7 @@ class LoadHomeDataUseCase(
                     } else null
                 }.toMap()
 
+            // Verifica dati validi
             if (currencies.isEmpty() || rates.isEmpty()) {
                 Result.failure(Exception("No currencies or rates available"))
             } else {
