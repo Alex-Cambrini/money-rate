@@ -1,5 +1,8 @@
 package it.unibo.domain.usecase.home
 
+/**
+ * Use case per ottenere i tassi più bassi fino a un limite specificato.
+ */
 class CalculateTopRatesUseCase {
     /**
      * Restituisce i top tassi più bassi fino al limite specificato.

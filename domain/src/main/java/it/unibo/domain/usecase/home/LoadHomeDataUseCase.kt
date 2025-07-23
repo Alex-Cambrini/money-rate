@@ -3,19 +3,27 @@ package it.unibo.domain.usecase.home
 import it.unibo.domain.usecase.currency.GetAvailableCurrenciesUseCase
 import it.unibo.domain.usecase.currencyrate.GetRateUseCase
 
+/**
+ * Carica valute disponibili e tassi di cambio rispetto a EUR.
+ */
 class LoadHomeDataUseCase(
     private val getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase,
     private val getRateUseCase: GetRateUseCase
 ) {
 
+    /**
+     * Contenitore dati con valute e tassi.
+     * @param currencies lista di coppie (codice, nome) delle valute
+     * @param rates mappa codice valuta -> tasso di cambio rispetto a EUR
+     */
     data class Data(
         val currencies: List<Pair<String, String>>,
         val rates: Map<String, Double>
     )
 
     /**
-     * Carica valute disponibili e i loro tassi rispetto a EUR.
-     * @return Result con Data se successo, altrimenti failure con eccezione
+     * Ottiene valute e tassi, esclude EUR e tassi zero.
+     * @return Result con Data o errore
      */
     suspend operator fun invoke(): Result<Data> {
         return try {
