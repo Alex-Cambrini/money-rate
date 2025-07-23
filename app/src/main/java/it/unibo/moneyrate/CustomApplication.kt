@@ -15,7 +15,10 @@ import it.unibo.moneyrate.worker.CurrencyUpdateWorker
 import it.unibo.moneyrate.worker.CurrencyUpdateWorkerFactory
 import java.util.concurrent.TimeUnit
 
-// Classe Application che configura WorkManager e i UseCase all'avvio.
+/**
+ * Application che inizializza le dipendenze e configura WorkManager.
+ * Registra il worker periodico per aggiornare la cache dei tassi di cambio.
+ */
 class CustomApplication : Application(), Configuration.Provider {
 
     private val repositoryProvider by lazy { RepositoryProviderImpl(this) }
@@ -24,6 +27,9 @@ class CustomApplication : Application(), Configuration.Provider {
         private const val UPDATE_INTERVAL_MINUTES = 15L
     }
 
+    /**
+     * Configura WorkManager con una factory per fornire le dipendenze ai worker.
+     */
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(
@@ -31,7 +37,10 @@ class CustomApplication : Application(), Configuration.Provider {
             )
             .build()
 
-    // Funzione eseguita all'avvio dell'app: configura UseCase e pianifica il Worker.
+    /**
+     * Inizializza i use case e avvia un worker periodico per aggiornare i tassi.
+     * Il worker verrà eseguito ogni 15 minuti se c'è una connessione di rete attiva.
+     */
     override fun onCreate() {
         super.onCreate()
         UseCaseProvider.setup(repositoryProvider)

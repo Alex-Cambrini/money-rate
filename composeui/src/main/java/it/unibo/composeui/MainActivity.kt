@@ -25,10 +25,15 @@ import it.unibo.domain.usecase.home.CalculateTopRatesUseCase
 import it.unibo.domain.usecase.home.GetSingleRateUseCase
 import it.unibo.domain.usecase.home.LoadHomeDataUseCase
 
+/**
+ * Activity principale dell'app.
+ * Avvia l'interfaccia utente impostando il tema e il punto d'ingresso dell'applicazione.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Imposta il contenuto della UI con il tema dell'app
         setContent {
             MoneyRateTheme {
                 AppEntryPoint()
@@ -37,6 +42,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Punto d'ingresso composable dell'app.
+ * Inizializza i ViewModel e decide se mostrare la schermata splash o quella principale.
+ */
 @Composable
 fun AppEntryPoint() {
     val context = LocalContext.current

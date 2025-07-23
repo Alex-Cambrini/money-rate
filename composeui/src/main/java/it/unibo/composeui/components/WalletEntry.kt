@@ -28,6 +28,10 @@ import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.domain.model.WalletEntry
 import java.util.Locale
 
+/**
+ * Mostra una card contenente un portafoglio (WalletEntry) con valuta, importo e valore in euro.
+ * Include anche i pulsanti per modificare o eliminare l'entry corrente.
+ */
 @Composable
 fun WalletEntryCard(
     entry: WalletEntry,
@@ -54,6 +58,7 @@ fun WalletEntryCard(
                 .padding(Dimens.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Colonna con il codice e nome della valuta
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.Start
@@ -61,6 +66,7 @@ fun WalletEntryCard(
                 Text(entry.currencyCode, style = MaterialTheme.typography.bodyMedium)
                 Text(entry.currencyName, style = MaterialTheme.typography.bodySmall)
             }
+            // Colonna con l'importo e il valore convertito in euro
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.End
@@ -74,6 +80,7 @@ fun WalletEntryCard(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+            // Colonna con i pulsanti di modifica ed eliminazione
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,

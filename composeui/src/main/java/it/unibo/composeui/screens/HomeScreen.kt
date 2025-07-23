@@ -51,6 +51,12 @@ import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.HomeViewModel
 import java.util.Locale
 
+/**
+ * Schermata principale per la conversione di valute.
+ * Permette di inserire un importo, selezionare due valute e visualizzare il risultato della conversione.
+ * Mostra anche un grafico con le 5 valute che hanno il tasso di cambio più alto rispetto alla valuta base,
+ * ovvero quelle con il valore unitario più basso.
+ */
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
     val amount by viewModel.amount.collectAsStateWithLifecycle("")
@@ -104,6 +110,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onBackground
             )
+            // Card principale con input e bottone di conversione
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -125,6 +132,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+                            // Input valuta di partenza
                             CurrencyInputRow(
                                 currency = baseCurrency,
                                 amount = baseAmount,
@@ -136,7 +144,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                                 },
                                 currencies = availableCurrencies
                             )
-
+                            // Input valuta di destinazione
                             CurrencyInputRow(
                                 currency = targetCurrency,
                                 amount = targetAmount,
@@ -152,6 +160,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
                         Spacer(modifier = Modifier.width(16.dp))
 
+                        // Bottone per invertire le valute e aggiornare gli importi
                         Column(
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -210,6 +219,9 @@ fun HomeScreen(viewModel: HomeViewModel) {
     }
 }
 
+/**
+ * Bottone per eseguire la conversione. Disabilitato se l'input non è valido o se è in caricamento.
+ */
 @Composable
 fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
     Button(
@@ -221,6 +233,10 @@ fun ConvertButton(enabled: Boolean, onClick: () -> Unit) {
     }
 }
 
+/**
+ * Disegna un grafico a barre con le 5 valute con il tasso di cambio più alto rispetto all'euro.
+ * Queste valute hanno il valore unitario più basso (cioè servono più unità per fare 1 euro).
+ */
 @Composable
 fun CurrencyBarChart(rates: Map<String, Double>) {
     if (rates.isEmpty()) return

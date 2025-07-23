@@ -35,6 +35,11 @@ import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.composeui.viewmodel.WalletViewModelFactory
 import it.unibo.domain.di.UseCaseProvider
 
+/**
+ * Schermata principale dell'app.
+ * Gestisce la struttura con barra di navigazione inferiore e visualizza una delle due schermate:
+ * HomeScreen o WalletScreen, a seconda della destinazione corrente.
+ */
 @Composable
 fun MainScreen(homeViewModel: HomeViewModel, mainViewModel: MainViewModel) {
     val navController = rememberNavController()
@@ -49,6 +54,7 @@ fun MainScreen(homeViewModel: HomeViewModel, mainViewModel: MainViewModel) {
                     .padding(Dimens.screenPadding)
                     .fillMaxSize()
             ) {
+                // Imposta la navigazione tra le due schermate principali
                 NavHost(
                     navController = navController,
                     startDestination = "home",
@@ -74,6 +80,7 @@ fun MainScreen(homeViewModel: HomeViewModel, mainViewModel: MainViewModel) {
                 }
             }
 
+            // Mostra un banner rosso se non c'è connessione internet
             ConnectionStatusBanner(
                 viewModel = mainViewModel,
                 modifier = Modifier
@@ -85,6 +92,10 @@ fun MainScreen(homeViewModel: HomeViewModel, mainViewModel: MainViewModel) {
     }
 }
 
+/**
+ * Barra di navigazione inferiore con due pulsanti: Home e Wallet.
+ * Evidenzia il pulsante attivo in base alla schermata corrente.
+ */
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -116,6 +127,10 @@ fun BottomNavigationBar(navController: NavHostController) {
     }
 }
 
+/**
+ * Banner di stato mostrato nella parte superiore dello schermo se non c'è connessione.
+ * Evidenziato con sfondo rosso e testo di avviso.
+ */
 @Composable
 fun ConnectionStatusBanner(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val isConnected by viewModel.isConnected.collectAsState()
