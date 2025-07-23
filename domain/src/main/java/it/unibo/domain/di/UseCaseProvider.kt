@@ -17,6 +17,10 @@ import it.unibo.domain.usecase.wallet.RemoveEntryUseCaseImpl
 import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCase
 import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCaseImpl
 
+/**
+ * Oggetto singleton che fornisce istanze dei Use Case del dominio.
+ * Gestisce le dipendenze tramite setup con un RepositoryProvider.
+ */
 object UseCaseProvider {
     // currency
     lateinit var getAvailableCurrenciesUseCase: GetAvailableCurrenciesUseCase
@@ -32,7 +36,12 @@ object UseCaseProvider {
     lateinit var removeEntryUseCase: RemoveEntryUseCase
     lateinit var updateWalletAmountUseCase: UpdateWalletAmountUseCase
 
-
+    /**
+     * Inizializza i use case con le implementazioni concrete,
+     * utilizzando le repository fornite dal RepositoryProvider.
+     *
+     * @param repositoryProvider fornitore delle repository necessarie ai use case
+     */
     fun setup(repositoryProvider: RepositoryProvider) {
         getAvailableCurrenciesUseCase = GetAvailableCurrenciesUseCaseImpl(
             currencyRepository = repositoryProvider.currencyRepository

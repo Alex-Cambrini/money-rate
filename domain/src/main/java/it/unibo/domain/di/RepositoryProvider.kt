@@ -5,6 +5,9 @@ import it.unibo.domain.repository.CurrencyRateRepository
 import it.unibo.domain.repository.CurrencyRepository
 import it.unibo.domain.repository.WalletRepository
 
+/**
+ * Fornisce le repository e il network checker usati dai use case.
+ */
 interface RepositoryProvider {
     val currencyRepository: CurrencyRepository
     val currencyRateRepository: CurrencyRateRepository
