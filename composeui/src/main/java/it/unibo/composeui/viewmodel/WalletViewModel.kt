@@ -19,6 +19,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel che gestisce le operazioni sul portafoglio valute:
+ * - caricamento voci e tassi
+ * - aggiunta, modifica, eliminazione voci
+ */
 class WalletViewModel(
     private val addEntryUseCase: AddEntryUseCase,
     private val removeEntryUseCase: RemoveEntryUseCase,
@@ -67,6 +72,9 @@ class WalletViewModel(
         }
     }
 
+    /**
+     * Carica i tassi di cambio dalla cache e aggiunge l'EUR con valore 1.0.
+     */
     fun loadRatesCache() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -78,6 +86,9 @@ class WalletViewModel(
         }
     }
 
+    /**
+     * Carica l'elenco delle valute disponibili (codice e nome)
+     */
     fun loadCurrencies() {
         viewModelScope.launch(Dispatchers.IO) {
             val list = getAvailableCurrenciesUseCase.invoke()
@@ -85,6 +96,10 @@ class WalletViewModel(
         }
     }
 
+    /**
+     * Calcola il totale delle voci del portafoglio convertito in Euro.
+     * Utilizza i tassi di cambio per la conversione.
+     */
     private fun calculateTotalInEuro(entries: List<WalletEntry>, rates: Map<String, Double>) {
         var sum = 0.0
         for (entry in entries) {
@@ -93,12 +108,18 @@ class WalletViewModel(
         _total.value = sum
     }
 
+    /**
+     * Converte una voce in euro, usando il tasso di cambio fornito
+     */
     fun convertToEuro(entry: WalletEntry, rates: Map<String, Double>): Double {
         val rate = rates[entry.currencyCode] ?: return 0.0
         val euroValue = entry.amount / rate
         return euroValue
     }
 
+    /**
+     * Aggiunge una nuova voce al portafoglio
+     */
     fun addWallet(currency: String, amount: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val name = _currencies.value.find { it.first == currency }?.second ?: currency
@@ -108,6 +129,9 @@ class WalletViewModel(
         }
     }
 
+    /**
+     * Modifica l'importo di una voce esistente
+     */
     fun modifyWallet(entry: WalletEntry, delta: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             _errorMessage.value = null
@@ -120,20 +144,32 @@ class WalletViewModel(
         }
     }
 
+    /**
+     * Elimina una voce dal portafoglio
+     */
     fun deleteWallet(entry: WalletEntry) {
         viewModelScope.launch(Dispatchers.IO) {
             removeEntryUseCase.invoke(entry)
         }
     }
 
+    /**
+     * Converte una stringa in Double accettando anche virgola come separatore decimale
+     */
     fun parseAmount(input: String): Double? {
         return input.replace(',', '.').toDoubleOrNull()
     }
 
+    /**
+     * Converte una stringa in Double per il delta, accettando anche virgola come separatore decimale
+     */
     fun parseDelta(input: String): Double? {
         return input.replace(',', '.').toDoubleOrNull()
     }
 
+    /**
+     * Resetta il messaggio di errore
+     */
     fun clearError() {
         _errorMessage.value = null
     }

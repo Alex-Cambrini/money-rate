@@ -21,6 +21,10 @@ import it.unibo.composeui.R
 import it.unibo.composeui.theme.Dimens
 import it.unibo.composeui.viewmodel.SplashViewModel
 
+/**
+ * Schermata di splash mostrata all'avvio dell'app durante il caricamento iniziale.
+ * Mostra un titolo e un indicatore di caricamento al centro dello schermo.
+ */
 @Composable
 fun SplashScreen() {
     Box(
@@ -44,6 +48,10 @@ fun SplashScreen() {
     }
 }
 
+/**
+ * Variante della splash screen che mostra un messaggio di errore se il caricamento fallisce.
+ * Include un pulsante per ritentare l'inizializzazione.
+ */
 @Composable
 fun SplashScreenWithError(onRetry: () -> Unit) {
     Box(
@@ -72,6 +80,10 @@ fun SplashScreenWithError(onRetry: () -> Unit) {
     }
 }
 
+/**
+ * Componente che gestisce la logica di visualizzazione della splash screen.
+ * Mostra la schermata corretta in base allo stato del ViewModel (caricamento, errore o successo).
+ */
 @Composable
 fun SplashScreenHost(
     splashViewModel: SplashViewModel,

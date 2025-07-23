@@ -36,7 +36,9 @@ import androidx.compose.ui.unit.dp
 import it.unibo.composeui.R
 import it.unibo.composeui.theme.Primary
 
-
+/**
+ * Anteprima del componente CurrencyInputRow per l'editor di layout.
+ */
 @Composable
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true)
 fun CurrencyInputRowPreview() {
@@ -49,6 +51,10 @@ fun CurrencyInputRowPreview() {
     )
 }
 
+/**
+ * Riga di input composta da un selettore di valuta e un campo per l'importo.
+ * Permette di selezionare una valuta e inserire un numero associato a quella valuta.
+ */
 @Composable
 fun CurrencyInputRow(
     currency: String,
@@ -109,6 +115,7 @@ fun CurrencyInputRow(
         val textColor = if (isDark) Color.White else Color.Black
         var isFocused by remember { mutableStateOf(false) }
 
+        // Campo di testo per inserire l'importo
         BasicTextField(
             value = amount,
             onValueChange = onAmountChange,

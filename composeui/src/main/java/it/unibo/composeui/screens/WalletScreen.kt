@@ -66,6 +66,11 @@ import it.unibo.composeui.viewmodel.WalletViewModel
 import it.unibo.domain.model.WalletEntry
 import java.util.Locale
 
+/**
+ * Schermata principale del portafoglio.
+ * Mostra tutte le valute salvate, il loro valore in euro, un grafico a ciambella
+ * e permette di aggiungere, modificare o eliminare voci.
+ */
 @Composable
 fun WalletScreen(viewModel: WalletViewModel) {
 
@@ -283,6 +288,10 @@ fun WalletScreen(viewModel: WalletViewModel) {
     }
 }
 
+/**
+ * Dialogo per aggiungere una nuova voce al portafoglio.
+ * Permette di selezionare una valuta e inserire l'importo iniziale.
+ */
 @Composable
 fun AddWalletDialog(
     viewModel: WalletViewModel,
@@ -353,6 +362,10 @@ fun AddWalletDialog(
     )
 }
 
+/**
+ * Dialogo per modificare l'importo di una valuta esistente.
+ * Accetta anche valori negativi per sottrarre dal totale.
+ */
 @Composable
 fun EditWalletDialog(
     viewModel: WalletViewModel,
@@ -420,6 +433,10 @@ fun EditWalletDialog(
     )
 }
 
+/**
+ * Dialogo di conferma per l’eliminazione di una voce dal portafoglio.
+ * Richiede l’approvazione dell’utente prima di procedere.
+ */
 @Composable
 fun ConfirmDeleteDialog(
     onConfirm: () -> Unit,
@@ -448,6 +465,10 @@ fun ConfirmDeleteDialog(
     )
 }
 
+/**
+ * Selettore a tendina che mostra l’elenco delle valute disponibili.
+ * Viene usato all’interno dei dialoghi per selezionare la valuta.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuCurrencySelector(
@@ -510,6 +531,10 @@ fun DropdownMenuCurrencySelector(
     }
 }
 
+/**
+ * Grafico a ciambella che rappresenta visivamente le proporzioni delle valute nel portafoglio.
+ * Ogni segmento è colorato e rappresenta una valuta.
+ */
 @Composable
 fun WalletDonutChart(
     entries: List<WalletEntry>,

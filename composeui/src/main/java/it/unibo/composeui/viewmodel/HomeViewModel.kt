@@ -15,6 +15,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel principale della schermata Home.
+ * Gestisce il caricamento dei dati iniziali, conversioni valutarie,
+ * aggiornamento delle valute disponibili e calcolo dei tassi principali.
+ */
 class HomeViewModel(
     private val loadHomeDataUseCase: LoadHomeDataUseCase,
     private val calculateTopRatesUseCase: CalculateTopRatesUseCase,
@@ -43,7 +48,9 @@ class HomeViewModel(
         calculateConversionUseCase(normalizedAmount, rate)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-
+    /**
+     * Carica le valute disponibili e i tassi attuali al primo avvio della schermata.
+     */
     fun loadInitialData() {
         viewModelScope.launch(Dispatchers.IO) {
             loadHomeDataUseCase().onSuccess {
@@ -54,19 +61,31 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Resetta il tasso di conversione.
+     */
     fun resetResult() {
         _rate.value = null
     }
 
+    /**
+     * Resetta sia l'importo che il tasso di conversione.
+     */
     fun resetConversion() {
         _amount.value = ""
         resetResult()
     }
 
+    /**
+     * Aggiorna l’importo digitato dall’utente.
+     */
     fun updateAmount(newAmount: String) {
         _amount.value = newAmount
     }
 
+    /**
+     * Carica il tasso di conversione tra due valute specificate.
+     */
     fun loadRate(base: String = "EUR", to: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoadingRate.value = true

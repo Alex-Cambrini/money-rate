@@ -10,6 +10,10 @@ import it.unibo.domain.usecase.wallet.GetAllEntriesUseCase
 import it.unibo.domain.usecase.wallet.RemoveEntryUseCase
 import it.unibo.domain.usecase.wallet.UpdateWalletAmountUseCase
 
+/**
+ * Factory per la creazione del ViewModel WalletViewModel.
+ * Inietta tutte le dipendenze necessarie tramite i relativi UseCase.
+ */
 class WalletViewModelFactory(
     private val addEntryUseCase: AddEntryUseCase,
     private val removeEntryUseCase: RemoveEntryUseCase,
@@ -20,6 +24,10 @@ class WalletViewModelFactory(
     private val updateWalletAmountUseCase: UpdateWalletAmountUseCase
 ) : ViewModelProvider.Factory {
 
+    /**
+     * Crea un'istanza di WalletViewModel se il tipo richiesto è compatibile.
+     * Lancia un'eccezione se il tipo richiesto non è supportato.
+     */
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WalletViewModel::class.java)) {
