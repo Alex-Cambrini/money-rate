@@ -15,7 +15,7 @@ import it.unibo.moneyrate.worker.CurrencyUpdateWorker
 import it.unibo.moneyrate.worker.CurrencyUpdateWorkerFactory
 import java.util.concurrent.TimeUnit
 
-
+// Classe Application che configura WorkManager e i UseCase all'avvio.
 class CustomApplication : Application(), Configuration.Provider {
 
     private val repositoryProvider by lazy { RepositoryProviderImpl(this) }
@@ -31,7 +31,7 @@ class CustomApplication : Application(), Configuration.Provider {
             )
             .build()
 
-
+    // Funzione eseguita all'avvio dell'app: configura UseCase e pianifica il Worker.
     override fun onCreate() {
         super.onCreate()
         UseCaseProvider.setup(repositoryProvider)
