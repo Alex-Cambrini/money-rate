@@ -11,22 +11,36 @@ import it.unibo.data.local.entity.CurrencyEntity
 import it.unibo.data.local.entity.CurrencyRateEntity
 import it.unibo.data.local.entity.WalletEntryEntity
 
-
+/**
+ * Database Room principale dell’applicazione.
+ * Contiene le entità CurrencyEntity, CurrencyRateEntity e WalletEntryEntity.
+ * Versione: 8.
+ * Offre metodi astratti per accedere ai DAO delle rispettive entità.
+ */
 @Database(
     entities = [CurrencyEntity::class, CurrencyRateEntity::class, WalletEntryEntity::class],
     version = 8,
     exportSchema = false
 )
-
 abstract class AppDatabase : RoomDatabase() {
+
+    /** DAO per i tassi di cambio */
     abstract fun currencyRateDao(): CurrencyRateDao
+
+    /** DAO per il portafoglio */
     abstract fun walletDao(): WalletDao
+
+    /** DAO per le valute */
     abstract fun currencyDao(): CurrencyDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        /**
+         * Restituisce l’istanza singleton del database.
+         * Crea il database se non esiste, con migrazioni distruttive come fallback.
+         */
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
@@ -41,4 +55,3 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
-
