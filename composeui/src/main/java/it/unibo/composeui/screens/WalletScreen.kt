@@ -148,17 +148,18 @@ fun WalletScreen(viewModel: WalletViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(Dimens.donutChartSpacing)
                     ) {
-                        if (entriesInEuro.isNotEmpty() && rates.isNotEmpty()) {
-                            WalletDonutChart(
-                                entries = entriesInEuro,
-                                modifier = Modifier.size(Dimens.donutChartSize),
-                                size = Dimens.donutChartSize,
-                                thickness = Dimens.donutChartThickness
-                            )
-                        } else {
-                            CircularProgressIndicator(modifier = Modifier.size(Dimens.donutChartSize))
+                        if (entries.isNotEmpty()) {
+                            if (rates.isNotEmpty()) {
+                                WalletDonutChart(
+                                    entries = entriesInEuro,
+                                    modifier = Modifier.size(Dimens.donutChartSize),
+                                    size = Dimens.donutChartSize,
+                                    thickness = Dimens.donutChartThickness
+                                )
+                            } else {
+                                CircularProgressIndicator(modifier = Modifier.size(Dimens.donutChartSize))
+                            }
                         }
-
 
                         Column(
                             verticalArrangement = Arrangement.spacedBy(Dimens.elementSpacing)
