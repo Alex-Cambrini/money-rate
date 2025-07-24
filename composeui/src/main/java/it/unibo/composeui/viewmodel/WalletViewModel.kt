@@ -47,6 +47,16 @@ class WalletViewModel(
         WrappedWalletData(entries, ratesCache)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, WrappedWalletData(emptyList(), emptyMap()))
 
+    val entriesInEuro: StateFlow<List<WalletEntry>> = combine(
+        _entries,
+        _ratesCache
+    ) { entries, ratesCache ->
+        entries.map { entry ->
+            val amountInEuro = convertToEuro(entry, ratesCache)
+            entry.copy(amount = amountInEuro, currencyCode = "EUR")
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
 
     private val _total = MutableStateFlow(0.0)
     val total: StateFlow<Double> = _total

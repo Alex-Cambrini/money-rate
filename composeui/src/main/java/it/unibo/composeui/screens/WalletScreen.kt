@@ -78,6 +78,8 @@ fun WalletScreen(viewModel: WalletViewModel) {
     val entries = combinedData.entries
     val rates = combinedData.ratesCache
 
+    val entriesInEuro by viewModel.entriesInEuro.collectAsStateWithLifecycle()
+
     val total by viewModel.total.collectAsState()
     val currencies: List<Pair<String, String>> by viewModel.currencies.collectAsStateWithLifecycle(
         emptyList()
@@ -146,9 +148,9 @@ fun WalletScreen(viewModel: WalletViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(Dimens.donutChartSpacing)
                     ) {
-                        if (rates.isNotEmpty()) {
+                        if (entriesInEuro.isNotEmpty() && rates.isNotEmpty()) {
                             WalletDonutChart(
-                                entries = entries,
+                                entries = entriesInEuro,
                                 modifier = Modifier.size(Dimens.donutChartSize),
                                 size = Dimens.donutChartSize,
                                 thickness = Dimens.donutChartThickness
@@ -177,9 +179,9 @@ fun WalletScreen(viewModel: WalletViewModel) {
                                             String.format(
                                                 Locale.ITALY,
                                                 "%.2f",
-                                                item.amount
+                                                entriesInEuro[index].amount
                                             )
-                                        }"
+                                        } €"
                                     )
                                 }
                             }
