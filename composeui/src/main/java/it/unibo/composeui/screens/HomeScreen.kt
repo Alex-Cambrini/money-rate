@@ -61,7 +61,7 @@ import java.util.Locale
 fun HomeScreen(viewModel: HomeViewModel) {
     val amount by viewModel.amount.collectAsStateWithLifecycle("")
     val result by viewModel.result.collectAsStateWithLifecycle(null)
-    val top10Rates by viewModel.top10Rates.collectAsStateWithLifecycle(emptyMap())
+    val top5Rates by viewModel.top5Rates.collectAsStateWithLifecycle(emptyMap())
     val availableCurrencies by viewModel.currencies.collectAsStateWithLifecycle(emptyList())
     val isLoadingRate by viewModel.isLoadingRate.collectAsStateWithLifecycle(false)
 
@@ -208,12 +208,12 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 }
             }
 
-            if (top10Rates.isNotEmpty()) {
+            if (top5Rates.isNotEmpty()) {
                 Text(
                     stringResource(R.string.ordered_by_strength),
                     style = MaterialTheme.typography.titleMedium
                 )
-                CurrencyBarChart(top10Rates)
+                CurrencyBarChart(top5Rates)
             }
         }
     }

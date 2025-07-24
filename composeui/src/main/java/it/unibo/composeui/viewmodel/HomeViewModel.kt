@@ -34,7 +34,7 @@ class HomeViewModel(
     val isLoadingRate: StateFlow<Boolean> = _isLoadingRate
 
     private val _latestRates = MutableStateFlow<Map<String, Double>>(emptyMap())
-    val top10Rates: StateFlow<Map<String, Double>> = _latestRates
+    val top5Rates: StateFlow<Map<String, Double>> = _latestRates
         .map { calculateTopRatesUseCase(it) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
